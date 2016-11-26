@@ -3,12 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20n", "L20n.csproj", "{CE292B59-9681-4B80-9031-7F6CA120F44D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20nTests", "..\L20nTests\L20nTests.csproj", "{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE292B59-9681-4B80-9031-7F6CA120F44D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE292B59-9681-4B80-9031-7F6CA120F44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE292B59-9681-4B80-9031-7F6CA120F44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -28,12 +34,21 @@ Global
 		$2.inheritsScope = text/plain
 		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
-		$3.IndentSwitchBody = True
 		$3.BeforeMethodDeclarationParentheses = False
 		$3.BeforeMethodCallParentheses = False
 		$3.BeforeConstructorDeclarationParentheses = False
+		$3.BeforeIndexerDeclarationBracket = False
 		$3.BeforeDelegateDeclarationParentheses = False
 		$3.NewParentheses = False
+		$3.IfParentheses = False
+		$3.WhileParentheses = False
+		$3.ForParentheses = False
+		$3.ForeachParentheses = False
+		$3.CatchParentheses = False
+		$3.SwitchParentheses = False
+		$3.LockParentheses = False
+		$3.UsingParentheses = False
+		$3.SpacesBeforeBrackets = False
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
