@@ -1,0 +1,12 @@
+language: csharp
+solution: L20n/L20n.sln
+mono:
+  - latest
+  - 3.10.0
+  - 3.8.0
+install:
+  - nuget restore L20n/L20n.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release L20n/L20n.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./L20nTests/bin/Release/L20nTests.dll

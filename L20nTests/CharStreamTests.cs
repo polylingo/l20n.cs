@@ -147,8 +147,12 @@ namespace L20nTests
 		[Test()]
 		public void ExceptionTests()
 		{
-			Assert.Throws<ParseException>(
-				() => NCS("a").ReadCharacter('b'));
+			try {
+				NCS("a").ReadCharacter('b');
+				Assert.IsFalse(true, "should not be reached");
+			} catch(Exception e) {
+				Assert.IsNotNull(e);
+			}
 		}
 
 		public static CharStream NCS(string buffer)
