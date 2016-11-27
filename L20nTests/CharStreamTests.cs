@@ -54,7 +54,7 @@ namespace L20nTests
 			Assert.AreEqual("L7:4", cs.ComputeDetailedPosition());
 			Assert.AreEqual("123", cs.ReadWhile((c) => Char.IsDigit((char)c)));
 			Assert.AreEqual("L7:7", cs.ComputeDetailedPosition());
-			cs.ReadCharacter(' ');
+			cs.SkipCharacter(' ');
 			Assert.AreEqual('b', cs.PeekNext());
 			Assert.AreEqual("L7:8", cs.ComputeDetailedPosition());
 			cs.SkipNext(); // b
@@ -88,7 +88,7 @@ namespace L20nTests
 			}
 			Assert.AreEqual("L11:11", cs.ComputeDetailedPosition());
 			Assert.AreEqual('a', cs.PeekNext());
-			cs.SkipNextN(2); // a,
+			cs.SkipBlock(2); // a,
 			Assert.AreEqual("L11:13", cs.ComputeDetailedPosition());
 			while(char.IsDigit(cs.PeekNext())) {
 				cs.SkipCharacter((pos++).ToString()[0]);
@@ -100,8 +100,16 @@ namespace L20nTests
 			Assert.IsEmpty(cs.ReadLine());
 			Assert.IsEmpty(cs.ReadLine());
 
+			cs.SkipString("[[");
+			Assert.AreEqual("L13:3", cs.ComputeDetailedPosition());
 			Assert.AreEqual("end", cs.ReadBlock(3));
+			Assert.AreEqual("L13:6", cs.ComputeDetailedPosition());
+			cs.SkipString("]]");
+			Assert.AreEqual("L13:8", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
+
+			Assert.AreEqual("\nor is it?\n", cs.ReadUntilEnd());
+			Assert.AreEqual("L16:1", cs.ComputeDetailedPosition());
 
 			Assert.IsTrue(cs.EndOfStream());
 		}
@@ -120,7 +128,6 @@ namespace L20nTests
 			Assert.AreEqual("six", cs.ReadLine());
 			Assert.AreEqual("seven", cs.ReadLine());
 			Assert.AreEqual("eight", cs.ReadLine());
-			Assert.IsEmpty(cs.ReadLine());
 			Assert.IsTrue(cs.EndOfStream());
 		}
 
@@ -131,7 +138,7 @@ namespace L20nTests
 			cs.SkipNext();
 			cs.SkipCharacter('a');
 			cs.SkipNext();
-			cs.SkipNextN(2);
+			cs.SkipBlock(2);
 			cs.SkipCharacter('b');
 			cs.SkipWhile(char.IsDigit);
 			Assert.AreEqual('b', cs.PeekNext());
@@ -148,7 +155,7 @@ namespace L20nTests
 		public void ExceptionTests()
 		{
 			try {
-				NCS("a").ReadCharacter('b');
+				NCS("a").SkipCharacter('b');
 				Assert.IsFalse(true, "should not be reached");
 			} catch(Exception e) {
 				Assert.IsNotNull(e);

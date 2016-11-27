@@ -54,6 +54,7 @@ namespace L20n
 				m_NewLineCount = 0;
 				m_NewLineStartPosition = 0;
 				m_Buffer = new List<char>();
+				m_BufferBlock = new char[8];
 			}
 						
 			/// <summary>
@@ -68,6 +69,7 @@ namespace L20n
 				m_NewLineCount = 0;
 				m_NewLineStartPosition = 0;
 				m_Buffer = new List<char>();
+				m_BufferBlock = new char[8];
 			}
 			
 			/// <summary>
@@ -92,10 +94,10 @@ namespace L20n
 			{
 				try {
 					++m_Position;
-					char next = (char) m_Stream.Read();
+					char next = (char)m_Stream.Read();
 					if(next == '\r') {
 						if(PeekNext() == NL) {
-							next = (char) m_Stream.Read(); // we count '\r\n' as 1 char
+							next = (char)m_Stream.Read(); // we count '\r\n' as 1 char
 						}
 					}
 
@@ -109,29 +111,17 @@ namespace L20n
 					throw CreateException("next character could not be read", e);
 				}
 			}
-			
-			/// <summary>
-			/// Reads the next expted Character, using <see cref="ReadNext"/>. 
-			/// </summary>
-			public char ReadCharacter(char expected)
-			{
-				char next = ReadNext();
-				if(next == expected)
-					return next;
-
-				throw CreateException(
-					string.Format("next character was {0}, while {1} was expected", next, expected), null, -1);
-			}
 
 			/// <summary>
 			/// Reads the block of size n;
 			/// </summary>
 			public string ReadBlock(int n)
 			{
-				char[] block = new char[n];
+				if(m_BufferBlock.Length < n)
+					m_BufferBlock = new char[n];
 				for(int i = 0; i < n; i++)
-					block[i] = ReadNext();
-				return new string(block);
+					m_BufferBlock[i] = ReadNext();
+				return new string(m_BufferBlock, 0, n);
 			}
 			
 			/// <summary>
@@ -163,10 +153,45 @@ namespace L20n
 			/// </summary>
 			public string ReadLine()
 			{
-				string output = ReadUntil(IsNL);
-				if(IsNL(PeekNext()))
-					SkipNext();
+				string output = m_Stream.ReadLine();
+				if(output != null) {
+					m_Position += output.Length + 1;
+					++m_NewLineCount;
+					m_NewLineStartPosition = m_Position;
+				}
+
 				return output;
+			}
+
+			public string ReadUntilEnd()
+			{
+				try {
+					string s = m_Stream.ReadToEnd();
+					if(s != null) {
+						m_Position += s.Length;
+
+						for(int i = 0; i < s.Length; ++i) {
+							if(s[i] == '\n') {
+								++m_NewLineCount;
+								m_NewLineStartPosition = m_Position;
+								continue;
+							}
+
+							if(s[i] == '\r') {
+								if(i < s.Length - 1 && s[i + 1] == '\n') {
+									++i;
+								}
+								
+								++m_NewLineCount;
+								m_NewLineStartPosition = m_Position;
+							}
+						}
+					}
+					
+					return s;
+				} catch(Exception e) {
+					throw CreateException("could not read until end", e);
+				}
 			}
 
 			/// <summary>
@@ -180,7 +205,7 @@ namespace L20n
 			/// <summary>
 			/// Skips the next N characters.
 			/// </summary>
-			public void SkipNextN(int n)
+			public void SkipBlock(int n)
 			{
 				for(int i = 0; i < n; i++)
 					ReadNext();
@@ -191,7 +216,10 @@ namespace L20n
 			/// </summary>
 			public void SkipCharacter(char expected)
 			{
-				ReadCharacter(expected);
+				char next = ReadNext();
+				if(next != expected)
+					throw CreateException(
+						string.Format("next character was {0}, while {1} was expected", next, expected), null, -1);
 			}
 
 			/// <summary>
@@ -210,6 +238,15 @@ namespace L20n
 			{
 				while(!EndOfStream() && !predicate(PeekNext()))
 					SkipNext();
+			}
+
+			/// <summary>
+			/// Skips the entire expected string
+			/// </summary>
+			public void SkipString(string expected)
+			{
+				for(int i = 0; i < expected.Length; ++i)
+					SkipCharacter(expected[i]);
 			}
 						
 			/// <summary>
@@ -241,7 +278,7 @@ namespace L20n
 			{
 				return new ParseException(
 					String.Format("'{0}' at {1} is unexpected: {2}",
-					(char) m_Stream.Peek(), ComputeDetailedPosition(offset), msg), e);
+					(char)m_Stream.Peek(), ComputeDetailedPosition(offset), msg), e);
 			}
 						
 			/// <summary>
@@ -267,6 +304,7 @@ namespace L20n
 			private int m_NewLineCount;
 			// a buffer used when reading an unknown amount of characters
 			private List<char> m_Buffer;
+			private char[] m_BufferBlock;
 		}
 	}
 }
