@@ -70,14 +70,29 @@ namespace L20nTests
 			Assert.AreEqual("こんにちは世界！", cs.ReadLine());
 			Assert.AreEqual("L9:1", cs.ComputeDetailedPosition());
 
-			// read 2 lines
+			// read 1 line
 			cs.SkipWhile((c) => c == CharStream.NL);
+			Assert.AreEqual("L10:1", cs.ComputeDetailedPosition());
+
+			// Read mix between ASCII (dsl) and unicode (locale)
+			cs.SkipCharacter('<');
+			Assert.AreEqual("L10:2", cs.ComputeDetailedPosition());
+			Assert.AreEqual("hello", cs.ReadWhile(char.IsLetter));
+			Assert.AreEqual("L10:7", cs.ComputeDetailedPosition());
+			cs.SkipString(" \"");
+			Assert.AreEqual("L10:9", cs.ComputeDetailedPosition());
+			Assert.AreEqual("你好", cs.ReadWhile((c) => c != '"'));
+			Assert.AreEqual("L10:11", cs.ComputeDetailedPosition());
+			Assert.AreEqual("\">", cs.ReadLine());
 			Assert.AreEqual("L11:1", cs.ComputeDetailedPosition());
+
+			// empty seperator line
+			Assert.IsEmpty(cs.ReadLine());
 
 			// making sure we're still correct
 			Assert.AreEqual('0', cs.PeekNext());
 			Assert.AreEqual('0', cs.PeekNext());
-			Assert.AreEqual("L11:1", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L12:1", cs.ComputeDetailedPosition());
 
 			int pos = 0;
 			while(char.IsDigit(cs.PeekNext())) {
@@ -86,30 +101,30 @@ namespace L20nTests
 					break; // early exit
 				cs.SkipCharacter(',');
 			}
-			Assert.AreEqual("L11:11", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L12:11", cs.ComputeDetailedPosition());
 			Assert.AreEqual('a', cs.PeekNext());
 			cs.SkipBlock(2); // a,
-			Assert.AreEqual("L11:13", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L12:13", cs.ComputeDetailedPosition());
 			while(char.IsDigit(cs.PeekNext())) {
 				cs.SkipCharacter((pos++).ToString()[0]);
 				if(cs.PeekNext() != ',')
 					break; // early exit
 				cs.SkipCharacter(',');
 			}
-			Assert.AreEqual("L11:22", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L12:22", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
 			Assert.IsEmpty(cs.ReadLine());
 
 			cs.SkipString("[[");
-			Assert.AreEqual("L13:3", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L14:3", cs.ComputeDetailedPosition());
 			Assert.AreEqual("end", cs.ReadBlock(3));
-			Assert.AreEqual("L13:6", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L14:6", cs.ComputeDetailedPosition());
 			cs.SkipString("]]");
-			Assert.AreEqual("L13:8", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L14:8", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
 
 			Assert.AreEqual("\nor is it?\n", cs.ReadUntilEnd());
-			Assert.AreEqual("L16:1", cs.ComputeDetailedPosition());
+			Assert.AreEqual("L17:1", cs.ComputeDetailedPosition());
 
 			Assert.IsTrue(cs.EndOfStream());
 		}
