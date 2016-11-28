@@ -29,7 +29,7 @@ namespace L20n
 						return true;
 					}
 					
-					ParseAndForget(cs);
+					Skip(cs);
 					comment = null;
 					return true;
 				}
@@ -41,7 +41,7 @@ namespace L20n
 					return new L20n.FTL.AST.Comment(value);
 				}
 				
-				private static void ParseAndForget(CharStream stream)
+				private static void Skip(CharStream stream)
 				{
 					stream.SkipCharacter('#');
 					stream.SkipWhile(IsNotNL);

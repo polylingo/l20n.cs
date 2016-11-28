@@ -71,7 +71,7 @@ namespace L20nTests
 			Assert.AreEqual("L9:1", cs.ComputeDetailedPosition());
 
 			// read 1 line
-			cs.SkipWhile((c) => c == CharStream.NL);
+			Assert.AreEqual(1, cs.SkipWhile((c) => c == CharStream.NL));
 			Assert.AreEqual("L10:1", cs.ComputeDetailedPosition());
 
 			// Read mix between ASCII (dsl) and unicode (locale)
@@ -155,14 +155,14 @@ namespace L20nTests
 			cs.SkipNext();
 			cs.SkipBlock(2);
 			cs.SkipCharacter('b');
-			cs.SkipWhile(char.IsDigit);
+			Assert.AreEqual(8, cs.SkipWhile(char.IsDigit));
 			Assert.AreEqual('b', cs.PeekNext());
-			cs.SkipWhile(char.IsLetter);
-			cs.SkipUntil(char.IsDigit);
+			Assert.AreEqual(3, cs.SkipWhile(char.IsLetter));
+			Assert.AreEqual(13, cs.SkipUntil(char.IsDigit));
 			Assert.AreEqual('1', cs.PeekNext());
-			cs.SkipWhile((c) => true);
+			Assert.AreEqual(1, cs.SkipWhile((c) => true));
 			Assert.IsTrue(cs.EndOfStream());
-			cs.SkipUntil((c) => false);
+			Assert.AreEqual(0, cs.SkipUntil((c) => false));
 			Assert.IsTrue(cs.EndOfStream());
 		}
 

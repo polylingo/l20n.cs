@@ -47,6 +47,8 @@
     <Compile Include="ftl\parsers\Parser.cs" />
     <Compile Include="ftl\parsers\Comment.cs" />
     <Compile Include="ftl\ast\Comment.cs" />
+    <Compile Include="ftl\parsers\NewLine.cs" />
+    <Compile Include="ftl\parsers\WhiteSpace.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

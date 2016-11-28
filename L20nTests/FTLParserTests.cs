@@ -14,12 +14,56 @@ namespace L20nTests
 {
 	[TestFixture()]
 	/// <summary>
-		/// Tests for all the individual parsers.
-		/// The l20n parser is a parser of parsers, so if all the small pieces work,
-		/// there is a very high chance that the final result is OK.
-		/// </summary>
-		public class FTLParserTests
+	/// Tests for all the individual parsers.
+	/// The l20n parser is a parser of parsers, so if all the small pieces work,
+	/// there is a very high chance that the final result is OK.
+	/// </summary>
+	public class FTLParserTests
 	{
+		[Test()]
+		public void WhiteSpaceTests()
+		{
+			var stream = NCS("   \t\t  ");
+			
+			// This will read everything
+			WhiteSpace.Skip(stream);
+			// This will not read anything, but it's optional
+			// so it will not give an exception
+			Assert.IsFalse(WhiteSpace.PeekAndSkip(stream));
+			// when trying to skip it will however give an exception
+			Throws(() => WhiteSpace.Skip(stream));
+			
+			
+			stream = NCS("   a <- foo");
+			
+			// This will read until 'a'
+			WhiteSpace.Skip(stream);
+			Assert.IsFalse(WhiteSpace.PeekAndSkip(stream));
+			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
+		}
+		
+		[Test()]
+		public void NewLineTests()
+		{
+			var stream = NCS("\n\r\n\n\n");
+			
+			// This will read everything
+			NewLine.Skip(stream);
+			// This will fail as it's not optional
+			Throws(() => NewLine.Skip(stream));
+			// When it's optional it will simply return false
+			Assert.IsFalse(NewLine.PeekAndSkip(stream));
+			
+			
+			stream = NCS("\n\r\n\n\ra <- foo");
+			
+			// This will read until 'a'
+			Assert.IsTrue(NewLine.PeekAndSkip(stream));
+			// This will fail as it's not optional
+			Throws(() => NewLine.Skip(stream));
+			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
+		}
+
 		[Test()]
 		public void CommentTests()
 		{
@@ -62,6 +106,17 @@ namespace L20nTests
 		{
 			var stream = new MemoryStream(Encoding.UTF8.GetBytes(buffer));
 			return new CharStream(new StreamReader(stream));
+		}
+
+		private delegate void ThrowFunction();
+		private static void Throws(ThrowFunction f)
+		{
+			try {
+				f();
+				Assert.IsFalse(true, "does not throw, while it was expected");
+			} catch(ParseException e) {
+				Assert.IsNotNull(e);
+			}
 		}
 	}
 }

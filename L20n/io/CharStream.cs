@@ -225,19 +225,30 @@ namespace L20n
 			/// <summary>
 			/// Skips as long as EOF is not reached and the predicate is satisfied
 			/// </summary>
-			public void SkipWhile(CharPredicate predicate)
+			public int SkipWhile(CharPredicate predicate)
 			{
-				while(!EndOfStream() && predicate(PeekNext()))
+				int n = 0;
+				while(!EndOfStream() && predicate(PeekNext())) {
 					SkipNext();
+					n++;
+				}
+
+				return n;
 			}
 			
 			/// <summary>
 			/// Skips as long as predicate is dissatisfied or EOF is reached
 			/// </summary>
-			public void SkipUntil(CharPredicate predicate)
+			public int SkipUntil(CharPredicate predicate)
 			{
-				while(!EndOfStream() && !predicate(PeekNext()))
+				int n = 0;
+
+				while(!EndOfStream() && !predicate(PeekNext())) {
 					SkipNext();
+					n++;
+				}
+
+				return n;
 			}
 
 			/// <summary>

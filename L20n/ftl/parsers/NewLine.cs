@@ -1,0 +1,34 @@
+// Glen De Cauwsemaecker licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+using System;
+
+using L20n.Exceptions;
+using L20n.IO;
+
+namespace L20n
+{
+	namespace FTL
+	{
+		namespace Parsers
+		{	
+			/// <summary>
+			/// The parser combinator used to parse all the newlines.
+			/// The resulting output does not get stored.
+			/// </summary>
+			public static class NewLine
+			{
+				public static void Skip(CharStream cs)
+				{
+					if(cs.SkipWhile(CharStream.IsNL) <= 0)
+						throw cs.CreateException(
+							"at least one newline character is required", null);
+				}
+
+				public static bool PeekAndSkip(CharStream cs)
+				{
+					return cs.SkipWhile(CharStream.IsNL) > 0;
+				}
+			}
+		}
+	}
+}
