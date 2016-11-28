@@ -39,10 +39,21 @@
     <Compile Include="io\Logger.cs" />
     <Compile Include="io\CharStream.cs" />
     <Compile Include="io\StreamReaderFactory.cs" />
+    <Compile Include="ftl\parsers\Context.cs" />
+    <Compile Include="ftl\ast\INode.cs" />
+    <Compile Include="ftl\ast\Body.cs" />
+    <Compile Include="ftl\ast\Entity.cs" />
+    <Compile Include="ftl\parsers\IParser.cs" />
+    <Compile Include="ftl\parsers\Parser.cs" />
+    <Compile Include="ftl\parsers\Comment.cs" />
+    <Compile Include="ftl\ast\Comment.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="exceptions\" />
     <Folder Include="io\" />
+    <Folder Include="ftl\" />
+    <Folder Include="ftl\parsers\" />
+    <Folder Include="ftl\ast\" />
   </ItemGroup>
 </Project>

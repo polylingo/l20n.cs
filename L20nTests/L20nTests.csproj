@@ -10,6 +10,7 @@
     <RootNamespace>L20nTests</RootNamespace>
     <AssemblyName>L20nTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ReleaseVersion>1.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -37,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharStreamTests.cs" />
+    <Compile Include="FTLParserTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
