@@ -94,7 +94,12 @@ namespace L20n
 			{
 				try {
 					++m_Position;
-					char next = (char)m_Stream.Read();
+					int i = m_Stream.Read();
+					if(i == -1) {
+						throw CreateException("EOF reached, while this was not expected", null);
+					}
+
+					char next = (char)i;
 					if(next == '\r') {
 						if(PeekNext() == NL) {
 							next = (char)m_Stream.Read(); // we count '\r\n' as 1 char
@@ -288,8 +293,8 @@ namespace L20n
 			public ParseException CreateException(string msg, Exception e, int offset = 0)
 			{
 				return new ParseException(
-					String.Format("'{0}' at {1} is unexpected: {2}",
-					(char)m_Stream.Peek(), ComputeDetailedPosition(offset), msg), e);
+					String.Format("unexpected situation at {0}: {1}",
+						ComputeDetailedPosition(offset), msg), e);
 			}
 						
 			/// <summary>

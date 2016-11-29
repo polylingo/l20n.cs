@@ -34,7 +34,7 @@ namespace L20n
 					return true;
 				}
 				
-				private static L20n.FTL.AST.Comment Parse(CharStream cs)
+				private static FTL.AST.Comment Parse(CharStream cs)
 				{
 					cs.SkipCharacter('#');
 					string value = cs.ReadWhile(IsNotNL);

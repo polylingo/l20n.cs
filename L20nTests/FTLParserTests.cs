@@ -102,6 +102,274 @@ namespace L20nTests
 			Assert.AreEqual("\n# new comment", stream.ReadUntilEnd());
 		}
 
+		[Test()]
+		public void KeywordTests()
+		{
+			// a normal (and best case example)
+			Assert.IsNotNull(Keyword.Parse(NCS("hello")));
+			
+			// other legal (but not always great) examples
+			Assert.IsNotNull(Keyword.Parse(NCS("this is valid")));
+			Assert.IsNotNull(Keyword.Parse(NCS("this_is_also_valid")));
+			Assert.IsNotNull(Keyword.Parse(NCS("this-is-also-valid")));
+			Assert.IsNotNull(Keyword.Parse(NCS("Could be a sentence.")));
+			Assert.IsNotNull(Keyword.Parse(NCS("Or a question?")));
+			Assert.IsNotNull(Keyword.Parse(NCS("Room 42")));
+			
+			// bad examples
+			Throws(() => Keyword.Parse(NCS(""))); // cannot be empty
+			Throws(() => Keyword.Parse(NCS("4 cannot start with a number")));
+			Throws(() => Keyword.Parse(NCS("@ is not allowed")));
+			Throws(() => Keyword.Parse(NCS("# is not allowed")));
+			Throws(() => Keyword.Parse(NCS(" cannot start with space")));
+		}
+
+		[Test()]
+		public void SectionFullASTTests()
+		{
+			L20n.FTL.AST.INode node;
+			
+			var ctx = new L20n.FTL.Parsers.Context(Context.ASTTypes.Full);
+			
+			// a section starts with '[['
+			Assert.IsFalse(Section.PeekAndParse(NCS("not a section"), ctx, out node));
+			Throws(() => Section.PeekAndParse(NCS("[not a section either]"), ctx, out node));
+			Assert.IsTrue(Section.PeekAndParse(NCS("[[ a section ]]"),ctx,  out node));
+			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets"), ctx, out node));
+			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets ]"), ctx, out node));
+		}
+
+		[Test()]
+		public void IdentifierTests()
+		{
+			// a normal (and best case example)
+			Assert.IsNotNull(Identifier.Parse(NCS("hello")));
+			
+			// other legal (but not always great) examples
+			Assert.IsNotNull(Identifier.Parse(NCS("this is valid")));
+			Assert.IsNotNull(Identifier.Parse(NCS("this_is_also_valid")));
+			Assert.IsNotNull(Identifier.Parse(NCS("this-is-also-valid")));
+			Assert.IsNotNull(Identifier.Parse(NCS("Could be a sentence.")));
+			Assert.IsNotNull(Identifier.Parse(NCS("Or a question?")));
+			Assert.IsNotNull(Identifier.Parse(NCS("Room 42")));
+			Assert.IsNotNull(Identifier.Parse(NCS("?")));
+			Assert.IsNotNull(Identifier.Parse(NCS(".-?_???")));
+			
+			// bad examples
+			Throws(() => Identifier.Parse(NCS(""))); // cannot be empty
+			Throws(() => Identifier.Parse(NCS("4 cannot start with a number")));
+			Throws(() => Identifier.Parse(NCS("@ is not allowed")));
+			Throws(() => Identifier.Parse(NCS("# is not allowed")));
+			Throws(() => Identifier.Parse(NCS("# is not allowed")));
+			Throws(() => Identifier.Parse(NCS(" cannot start with space")));
+		}
+
+		[Test()]
+		public void BuiltinTests()
+		{
+			// a normal (and best case example)
+			Assert.IsNotNull(Builtin.Parse(NCS("NUMBER")));
+			
+			// other legal (but not always great) examples
+			Assert.IsNotNull(Builtin.Parse(NCS("SOME_BUILT-IN")));
+			Assert.IsNotNull(Builtin.Parse(NCS("?-._A-Z")));
+			
+			// bad examples
+			Throws(() => Builtin.Parse(NCS(""))); // cannot be empty
+			Throws(() => Builtin.Parse(NCS("4 cannot start with a number")));
+			Throws(() => Builtin.Parse(NCS("@ is not allowed")));
+			Throws(() => Builtin.Parse(NCS("# is not allowed")));
+			Throws(() => Builtin.Parse(NCS("# is not allowed")));
+			Throws(() => Builtin.Parse(NCS(" cannot start with space")));
+			Throws(() => Builtin.Parse(NCS("aNOPE"))); // cannot contain lowercase letters
+		}
+
+		private void checkValidNumber(string input, string expected, string rest = "")
+		{
+			var cs = NCS(input);
+			var number = Number.Parse(cs);
+			Assert.IsNotNull(number);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+
+			StringWriter writer = new StringWriter();
+			number.Serialize(writer);
+			Assert.AreEqual(expected, writer.ToString());
+		}
+
+		[Test()]
+		public void NumberTests()
+		{
+			// legal examples
+			checkValidNumber("42", "42");
+			checkValidNumber("123.456", "123.456");
+			
+			// bad examples that do not make it throw an exception,
+			// but just stop parsing instead
+			checkValidNumber("42,00", "42", ",00");
+			
+			// bad examples
+			Throws(() => Number.Parse(NCS("42."))); // no digits behind the point given
+			Throws(() => Number.Parse(NCS("-42"))); // '-' not allowed
+			Throws(() => Number.Parse(NCS("+42"))); // '+' not allowed
+			Throws(() => Number.Parse(NCS("hello"))); // only numbers allowed
+		}
+
+		[Test()]
+		public void VariableTests()
+		{
+			// As long as it's an identifier prefixed with '$' it's fine
+			Assert.IsNotNull(Variable.Parse(NCS("$hello")));
+			Assert.IsNotNull(Variable.Parse(NCS("$Whatever")));
+			
+			// otherwise we get an exception
+			Throws(() => Variable.Parse(NCS("nope"))); // no '$' prefix
+
+			Throws(() => Variable.Parse(NCS("$4"))); // illegal identifier
+
+			// check on Identifier to know more about what
+			// kind of identifier is legal and what not
+		}
+
+		[Test()]
+		public void MemberExpressionTests()
+		{
+			Assert.IsTrue(MemberExpression.Peek(NCS("[")));
+			Assert.IsFalse(MemberExpression.Peek(NCS("foo")));
+			
+			var id = Identifier.Parse(NCS("foo"));
+			
+			// MemberExpressionParsing starts from the '['
+			Assert.IsNotNull(MemberExpression.Parse(NCS("[bar]"), id));
+			Assert.IsNotNull(MemberExpression.Parse(NCS("[this_is-ok?42]"), id));
+			
+			// otherwise we get an exception
+			Throws(() => MemberExpression.Parse(NCS("nope"), id)); // no '[' prefix
+			Throws(() => MemberExpression.Parse(NCS("[nope"), id)); // no ']' postfix
+			Throws(() => MemberExpression.Parse(NCS("[42]"), id)); // illegal keyword
+		}
+
+		[Test()]
+		public void AttributeTests()
+		{
+			// good examples
+			Assert.IsNotNull(Memberkey.Parse(NCS("bar")));
+			Assert.IsNotNull(Memberkey.Parse(NCS("foo/bar")));
+			Assert.IsNotNull(Memberkey.Parse(NCS("42")));
+			Assert.IsNotNull(Memberkey.Parse(NCS("42.0")));
+
+			// bad examples
+			Throws(() => Memberkey.Parse(NCS("foo/42")));
+
+			// check identifier-, keyword- and number- tests for more info
+		}
+
+		private void checkValidArgument<T>(string input, string rest = "")
+		{
+			var cs = NCS(input);
+			var argument = Argument.Parse(cs);
+			Assert.IsNotNull(argument);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(T), argument.GetType());
+		}
+		
+		[Test()]
+		public void ArgumentTests()
+		{
+			// just some examples,
+			// for more good/bad examples of each case,
+			// check the tests for that case
+			
+			// Identifier
+			checkValidArgument<L20n.FTL.AST.StringPrimitive>("Foo");
+			checkValidExpression<L20n.FTL.AST.StringPrimitive>("boo909");
+			
+			// MemberExpression
+			checkValidArgument<L20n.FTL.AST.MemberExpression>("foo[bar]");
+			checkValidArgument<L20n.FTL.AST.MemberExpression>("Foo09?[bar09?]");
+			
+			// CallExpression
+			checkValidArgument<L20n.FTL.AST.CallExpression>("FOO()");
+			checkValidArgument<L20n.FTL.AST.CallExpression>("FOO(DROP(2, baz))");
+			
+			// Variable
+			checkValidArgument<L20n.FTL.AST.Variable>("$ok");
+			checkValidArgument<L20n.FTL.AST.Variable>("$Variable");
+			
+			// QuotedPattern
+			// TODO
+			
+			// Number
+			checkValidArgument<L20n.FTL.AST.Number>("42");
+			checkValidArgument<L20n.FTL.AST.Number>("123.456");
+
+			// KeywordArgument
+			// TODO
+
+			// should not be empty
+			Throws(() => Argument.Parse(NCS("")));
+		}
+
+		[Test()]
+		public void CallExpressionTests()
+		{
+			var builtin = Builtin.Parse(NCS("FOO"));
+
+			// good examples
+			Assert.IsNotNull(CallExpression.Parse(NCS("()"), builtin));
+			Assert.IsNotNull(CallExpression.Parse(NCS("(hello)"), builtin));
+			Assert.IsNotNull(CallExpression.Parse(NCS("(hello, world)"), builtin));
+			Assert.IsNotNull(CallExpression.Parse(NCS("(hello  ,  world)"), builtin));
+			Assert.IsNotNull(CallExpression.Parse(NCS("(hello,world, 42)"), builtin));
+			Assert.IsNotNull(CallExpression.Parse(NCS("(glen, 42, member[test], $ok, FOO(bar))"), builtin));
+
+			// bad examples
+			// should not be empty
+			Throws(() => Argument.Parse(NCS("")));
+		}
+
+		private void checkValidExpression<T>(string input, string rest = "")
+		{
+			var cs = NCS(input);
+			var expression = Expresson.Parse(cs);
+			Assert.IsNotNull(expression);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(T), expression.GetType());
+		}
+
+		[Test()]
+		public void ExpressionTests()
+		{
+			// just some examples,
+			// for more good/bad examples of each case,
+			// check the tests for that case
+
+			// Identifier
+			checkValidExpression<L20n.FTL.AST.StringPrimitive>("Foo");
+			checkValidExpression<L20n.FTL.AST.StringPrimitive>("boo909");
+
+			// MemberExpression
+			checkValidExpression<L20n.FTL.AST.MemberExpression>("foo[bar]");
+			checkValidExpression<L20n.FTL.AST.MemberExpression>("Foo09?[bar09?]");
+			
+			// CallExpression
+			checkValidExpression<L20n.FTL.AST.CallExpression>("FOO()");
+			checkValidExpression<L20n.FTL.AST.CallExpression>("FOO(DROP(2, baz))");
+			
+			// Variable
+			checkValidExpression<L20n.FTL.AST.Variable>("$ok");
+			checkValidExpression<L20n.FTL.AST.Variable>("$Variable");
+
+			// QuotedPattern
+			// TODO
+
+			// Number
+			checkValidExpression<L20n.FTL.AST.Number>("42");
+			checkValidExpression<L20n.FTL.AST.Number>("123.456");
+
+			// should not be empty
+			Throws(() => Argument.Parse(NCS("")));
+		}
+
 		public static CharStream NCS(string buffer)
 		{
 			var stream = new MemoryStream(Encoding.UTF8.GetBytes(buffer));

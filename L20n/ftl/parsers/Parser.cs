@@ -16,23 +16,21 @@ namespace L20n
 			public sealed class Parser : IParser
 			{	
 				/// <summary>
-				/// Initializes a new instance of the <see cref="L20n.FTL.Parsers.Parser"/> class.
-				/// </summary>
-				public Parser()
-				{
-				}
-
-				/// <summary>
 				/// Parses an entire charstream into an FTL AST
 				/// </summary>
 				public FTL.AST.Body Parse(CharStream cs, Context ctx)
 				{
-					FTL.AST.Body root = new FTL.AST.Body();
-					return root;
-				}
+					FTL.AST.Body root = new FTL.AST.Body(ctx);
+					L20n.FTL.AST.INode entry;
+					
+					while(Entry.PeekAndParse(cs, ctx, out entry)) {
+						if(entry != null) // could have been ommitted because of partial AST
+							root.AddEntry(entry);
+						if(!NewLine.PeekAndSkip(cs))
+							break;
+					}
 
-				public void Dispose()
-				{
+					return root;
 				}
 			}
 		}

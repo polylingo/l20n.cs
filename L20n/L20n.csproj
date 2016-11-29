@@ -49,6 +49,29 @@
     <Compile Include="ftl\ast\Comment.cs" />
     <Compile Include="ftl\parsers\NewLine.cs" />
     <Compile Include="ftl\parsers\WhiteSpace.cs" />
+    <Compile Include="ftl\ast\StringPrimitive.cs" />
+    <Compile Include="ftl\parsers\Keyword.cs" />
+    <Compile Include="ftl\parsers\Identifier.cs" />
+    <Compile Include="ftl\ast\Variable.cs" />
+    <Compile Include="ftl\parsers\Variable.cs" />
+    <Compile Include="ftl\ast\Number.cs" />
+    <Compile Include="ftl\parsers\Number.cs" />
+    <Compile Include="ftl\parsers\Builtin.cs" />
+    <Compile Include="ftl\ast\MemberExpression.cs" />
+    <Compile Include="ftl\parsers\MemberExpression.cs" />
+    <Compile Include="ftl\ast\KeywordArgument.cs" />
+    <Compile Include="ftl\parsers\Argument.cs" />
+    <Compile Include="ftl\parsers\QuotedPattern.cs" />
+    <Compile Include="ftl\ast\ArgumentsList.cs" />
+    <Compile Include="ftl\ast\CallExpression.cs" />
+    <Compile Include="ftl\parsers\CallExpression.cs" />
+    <Compile Include="ftl\parsers\Expression.cs" />
+    <Compile Include="ftl\ast\Section.cs" />
+    <Compile Include="ftl\parsers\Section.cs" />
+    <Compile Include="ftl\parsers\Message.cs" />
+    <Compile Include="ftl\parsers\Entry.cs" />
+    <Compile Include="ftl\parsers\MemberKey.cs" />
+    <Compile Include="ftl\ast\Attribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

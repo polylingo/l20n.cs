@@ -169,10 +169,19 @@ namespace L20nTests
 		[Test()]
 		public void ExceptionTests()
 		{
+			// EOF while character was expected
+			Throws(() => NCS("").ReadNext());
+			// wrong character
+			Throws(() => NCS("a").SkipCharacter('b'));
+		}
+
+		private delegate void ThrowFunction();
+		private static void Throws(ThrowFunction f)
+		{
 			try {
-				NCS("a").SkipCharacter('b');
-				Assert.IsFalse(true, "should not be reached");
-			} catch(Exception e) {
+				f();
+				Assert.IsFalse(true, "does not throw, while it was expected");
+			} catch(ParseException e) {
 				Assert.IsNotNull(e);
 			}
 		}

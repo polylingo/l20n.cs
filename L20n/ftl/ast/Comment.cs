@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace L20n
 {
@@ -21,15 +22,16 @@ namespace L20n
 				/// <param name="value">Value.</param>
 				public Comment(string value)
 				{
-					m_Value = value;
+					m_Values = new List<string>(1);
+					m_Values.Add(value);
 				}
 
 				/// <summary>
-				/// Returns the most optimized form of itself.
+				/// A comment is metadata, and thus optimization does not apply to it.
 				/// </summary>
 				public INode Optimize()
 				{
-					throw new NotImplementedException();
+					return this;
 				}
 				
 				/// <summary>
@@ -37,10 +39,20 @@ namespace L20n
 				/// </summary>
 				public void Serialize(TextWriter writer)
 				{
-					writer.WriteLine("#" + m_Value);
+					for(int i = 0; i < m_Values.Count; ++i)
+						writer.WriteLine("#" + m_Values[i]);
+				}
+
+				/// <summary>
+				/// Appends the given comment on a new line to the existing comment.
+				/// </summary>
+				public void Merge(Comment otherComment)
+				{
+					for(int i = 0; i < otherComment.m_Values.Count; ++i)
+						m_Values.Add(otherComment.m_Values[i]);
 				}
 				
-				private readonly string m_Value;
+				private List<string> m_Values; // one value per line
 			}
 		}
 	}
