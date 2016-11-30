@@ -14,6 +14,13 @@ namespace L20n
 			/// </summary>
 			public sealed class Entity : INode
 			{	
+				public Entity(StringPrimitive identifier, Pattern pattern, MemberList memberList)
+				{
+					m_Identifier = identifier;
+					m_Pattern = pattern;
+					m_MemberList = memberList;
+				}
+
 				/// <summary>
 				/// Returns the most optimized form of itself.
 				/// </summary>
@@ -32,7 +39,12 @@ namespace L20n
 						m_Comment.Serialize(writer);
 
 					// write the actual content
-					// <ADD MESSAGE CONTENT HERE>
+					m_Identifier.Serialize(writer);
+					writer.Write(" = ");
+					if(m_Pattern != null)
+						m_Pattern.Serialize(writer);
+					if(m_MemberList != null)
+						m_MemberList.Serialize(writer);
 					writer.Write('\n');
 					throw new NotImplementedException();
 				}
@@ -46,6 +58,9 @@ namespace L20n
 				}
 
 				private Comment m_Comment;
+				private readonly StringPrimitive m_Identifier;
+				private readonly Pattern m_Pattern;
+				private readonly MemberList m_MemberList;
 			}
 		}
 	}

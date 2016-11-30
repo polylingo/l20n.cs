@@ -35,6 +35,7 @@ namespace L20n
 
 				private static FTL.AST.Section Parse(CharStream cs)
 				{
+					WhiteSpace.PeekAndSkip(cs);
 					cs.SkipString(PREFIX);
 					WhiteSpace.PeekAndSkip(cs);
 					
@@ -42,16 +43,20 @@ namespace L20n
 					
 					WhiteSpace.PeekAndSkip(cs);
 					cs.SkipString(POSTFIX);
+					WhiteSpace.PeekAndSkip(cs);
+					NewLine.Skip(cs);
 					
 					return new FTL.AST.Section(keyword);
 				}
 				
-				private static void Skip(CharStream stream)
+				private static void Skip(CharStream cs)
 				{
-					stream.SkipString(PREFIX);
+					WhiteSpace.PeekAndSkip(cs);
+					cs.SkipString(PREFIX);
 					// this does mean that for applications the section could be bullox, but that's fine
 					// tooling should prevent such things
-					stream.SkipWhile(IsNotNewLine);
+					cs.SkipWhile(IsNotNewLine);
+					NewLine.Skip(cs);
 				}
 
 				private const string PREFIX = "[[";

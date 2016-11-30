@@ -32,11 +32,14 @@ namespace L20n
 						// otherwise we'll assume it's simply an identifier and return early
 						if(cs.PeekNext() != '=')
 							return Expresson.ParseWithIdentifier(cs, result as FTL.AST.StringPrimitive);
+
+						cs.SkipNext();
+						WhiteSpace.PeekAndSkip(cs);
 							
-						FTL.AST.INode value = QuotedPattern.Parse(cs);
+						FTL.AST.Pattern pattern = Pattern.ParseQuoted(cs);
 						return new FTL.AST.KeywordArgument(
 								result as L20n.FTL.AST.StringPrimitive,
-								value);
+								pattern);
 					}
 						
 					// it's not an identifier, so is must be any non-identifier expression

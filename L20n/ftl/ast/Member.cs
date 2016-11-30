@@ -12,18 +12,19 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a keyword-argument.
-			/// More Information: <see cref="L20nCore.L20n.FTL.Parsers.Argument"/>
+			/// The AST representation for a member.
+			/// More Information: <see cref="L20nCore.L20n.FTL.Parsers.Member"/>
 			/// </summary>
-			public sealed class KeywordArgument : INode
+			public sealed class Member : INode
 			{
 				/// <summary>
-				/// Initializes a new instance of the <see cref="L20n.FTL.AST.KeywordArgument"/> class.
+				/// Initializes a new instance of the <see cref="L20n.FTL.AST.Member"/> class.
 				/// </summary>
-				public KeywordArgument(StringPrimitive identifier, Pattern quotedPattern)
+				public Member(INode key, Pattern pattern, bool isDefault)
 				{
-					m_Identifier = identifier;
-					m_QuotedPattern = quotedPattern;
+					m_Key = key;
+					m_Pattern = pattern;
+					m_IsDefault = isDefault;
 				}
 				
 				/// <summary>
@@ -39,13 +40,17 @@ namespace L20n
 				/// </summary>
 				public void Serialize(TextWriter writer)
 				{
-					m_Identifier.Serialize(writer);
-					writer.Write(" = ");
-					m_QuotedPattern.Serialize(writer);
+					if(m_IsDefault)
+						writer.Write('*');
+					writer.Write('[');
+					m_Key.Serialize(writer);
+					writer.Write("] ");
+					m_Pattern.Serialize(writer);
 				}
 				
-				private readonly StringPrimitive m_Identifier;
-				private readonly Pattern m_QuotedPattern;
+				private readonly INode m_Key;
+				private readonly Pattern m_Pattern;
+				private readonly bool m_IsDefault;
 			}
 		}
 	}

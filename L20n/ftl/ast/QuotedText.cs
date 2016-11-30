@@ -10,10 +10,9 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for any StringPrimitive.
-			/// Used for <builtin>, <keyword>, <identifier> and <unquotedText>
+			/// The AST representation for <quoted-text>.
 			/// </summary>
-			public sealed class StringPrimitive : INode
+			public sealed class QuotedText : INode
 			{
 				/// <summary>
 				/// Gets the internal string as a constant.
@@ -22,15 +21,15 @@ namespace L20n
 				{
 					get { return m_Value; }
 				}
-
+				
 				/// <summary>
-				/// Initializes a new instance of the <see cref="L20n.FTL.AST.StringPrimitive"/> class.
+				/// Initializes a new instance of the <see cref="L20n.FTL.AST.QuotedText"/> class.
 				/// </summary>
-				public StringPrimitive(string value)
+				public QuotedText(string value)
 				{
 					m_Value = value;
 				}
-
+				
 				/// <summary>
 				/// Returns itself, as it can't be optimized any further.
 				/// </summary>
@@ -44,7 +43,7 @@ namespace L20n
 				/// </summary>
 				public void Serialize(TextWriter writer)
 				{
-					writer.Write(m_Value);
+					writer.Write("\"{0}\"", m_Value);
 				}
 				
 				private readonly string m_Value;

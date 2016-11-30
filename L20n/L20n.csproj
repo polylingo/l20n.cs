@@ -61,7 +61,6 @@
     <Compile Include="ftl\parsers\MemberExpression.cs" />
     <Compile Include="ftl\ast\KeywordArgument.cs" />
     <Compile Include="ftl\parsers\Argument.cs" />
-    <Compile Include="ftl\parsers\QuotedPattern.cs" />
     <Compile Include="ftl\ast\ArgumentsList.cs" />
     <Compile Include="ftl\ast\CallExpression.cs" />
     <Compile Include="ftl\parsers\CallExpression.cs" />
@@ -72,6 +71,19 @@
     <Compile Include="ftl\parsers\Entry.cs" />
     <Compile Include="ftl\parsers\MemberKey.cs" />
     <Compile Include="ftl\ast\Attribute.cs" />
+    <Compile Include="ftl\parsers\Placeable.cs" />
+    <Compile Include="ftl\ast\Placeable.cs" />
+    <Compile Include="ftl\ast\SelectExpression.cs" />
+    <Compile Include="ftl\ast\Member.cs" />
+    <Compile Include="ftl\parsers\Member.cs" />
+    <Compile Include="ftl\parsers\Pattern.cs" />
+    <Compile Include="ftl\ast\Pattern.cs" />
+    <Compile Include="ftl\parsers\PlaceableExpression.cs" />
+    <Compile Include="ftl\ast\MemberList.cs" />
+    <Compile Include="ftl\parsers\MemberList.cs" />
+    <Compile Include="ftl\ast\QuotedText.cs" />
+    <Compile Include="ftl\ast\BlockText.cs" />
+    <Compile Include="ftl\parsers\AnyText.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -21,21 +21,16 @@ namespace L20n
 				{
 					FTL.AST.INode result;
 						
-					if(Identifier.PeekAndParse(stream, out result)) {
+					if(Identifier.PeekAndParse(stream, out result))
 						return ParseWithIdentifier(stream, result as FTL.AST.StringPrimitive);
-					}
 						
 					if(Variable.PeekAndParse(stream, out result))
 						return result;
 						
-					if(QuotedPattern.PeekAndParse(stream, out result))
-						return result;
-						
 					if(Number.PeekAndParse(stream, out result))
 						return result;
-						
-					throw stream.CreateException(
-							"no <expression> could be found, while one was expected", null);
+
+					return Pattern.ParseQuoted(stream);
 				}
 
 				public static FTL.AST.INode ParseWithIdentifier(

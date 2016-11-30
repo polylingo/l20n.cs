@@ -75,31 +75,31 @@ namespace L20nTests
 			L20n.FTL.AST.INode node;
 				
 			// This will read everything
-			stream = NCS("# a comment in expected form");
+			stream = NCS("# a comment in expected form\n");
 			Assert.IsTrue(Comment.PeekAndParse(stream, fctx, out node));
 			Assert.IsNotNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
 			// This will also read everything, but as it's partial, it will be discarded
-			stream = NCS("# a comment in expected form");
+			stream = NCS("# a comment in expected form\n");
 			Assert.IsTrue(Comment.PeekAndParse(stream, pctx, out node));
 			Assert.IsNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
 				
 			// this will fail
-			Assert.IsFalse(Comment.PeekAndParse(NCS("as it is not a comment"), pctx, out node));
+			Assert.IsFalse(Comment.PeekAndParse(NCS("as it is not a comment\n"), pctx, out node));
 			Assert.IsNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
 			// this will also fail
-			Assert.IsFalse(Comment.PeekAndParse(NCS("as # it is still not a comment"), pctx, out node));
+			Assert.IsFalse(Comment.PeekAndParse(NCS("as # it is still not a comment\n"), pctx, out node));
 			Assert.IsNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
 				
 			// The Comment parser will read the entire stream
 			// once it detirmined it's a legal comment
-			stream = NCS("# a comment in expected form\n# new comment");
+			stream = NCS("# a comment in expected form\n# new comment\n");
 			Assert.IsTrue(Comment.PeekAndParse(stream, fctx, out node));
 			Assert.IsNotNull(node);
-			Assert.AreEqual("\n# new comment", stream.ReadUntilEnd());
+			Assert.AreEqual("# new comment\n", stream.ReadUntilEnd());
 		}
 
 		[Test()]
@@ -134,9 +134,10 @@ namespace L20nTests
 			// a section starts with '[['
 			Assert.IsFalse(Section.PeekAndParse(NCS("not a section"), ctx, out node));
 			Throws(() => Section.PeekAndParse(NCS("[not a section either]"), ctx, out node));
-			Assert.IsTrue(Section.PeekAndParse(NCS("[[ a section ]]"),ctx,  out node));
+			Assert.IsTrue(Section.PeekAndParse(NCS("[[ a section ]]\n"),ctx,  out node));
 			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets"), ctx, out node));
 			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets ]"), ctx, out node));
+			Throws(() => Section.PeekAndParse(NCS("[[ needs to have newline char at the end ]]"), ctx, out node));
 		}
 
 		[Test()]
@@ -296,14 +297,16 @@ namespace L20nTests
 			checkValidArgument<L20n.FTL.AST.Variable>("$Variable");
 			
 			// QuotedPattern
-			// TODO
+			checkValidArgument<L20n.FTL.AST.Pattern>("\"value\"");
+			checkValidArgument<L20n.FTL.AST.Pattern>("\"{ \"{ $variable }\" }\"");
 			
 			// Number
 			checkValidArgument<L20n.FTL.AST.Number>("42");
 			checkValidArgument<L20n.FTL.AST.Number>("123.456");
 
 			// KeywordArgument
-			// TODO
+			checkValidArgument<L20n.FTL.AST.KeywordArgument>("key = \"value\"");
+			checkValidArgument<L20n.FTL.AST.KeywordArgument>("key = \"{ $variable }\"");
 
 			// should not be empty
 			Throws(() => Argument.Parse(NCS("")));
@@ -360,7 +363,8 @@ namespace L20nTests
 			checkValidExpression<L20n.FTL.AST.Variable>("$Variable");
 
 			// QuotedPattern
-			// TODO
+			checkValidArgument<L20n.FTL.AST.Pattern>("\"value\"");
+			checkValidArgument<L20n.FTL.AST.Pattern>("\"{ \"{ $variable }\" }\"");
 
 			// Number
 			checkValidExpression<L20n.FTL.AST.Number>("42");
@@ -369,6 +373,65 @@ namespace L20nTests
 			// should not be empty
 			Throws(() => Argument.Parse(NCS("")));
 		}
+
+		[Test()]
+		public void UnquotedTextTests()	
+		{
+			Assert.IsNotNull(AnyText.ParseUnquoted(NCS("this is fine")));
+			Assert.IsNotNull(AnyText.ParseUnquoted(NCS("can be almost anything\nanother line")));
+			Assert.IsNotNull(AnyText.ParseUnquoted(NCS("curly brackets to have be escaped like this: \\{")));
+
+			CharStream cs = NCS("otherwise {it will stop");
+			Assert.IsNotNull(AnyText.ParseUnquoted(cs));
+			Assert.AreEqual("{it will stop", cs.ReadUntilEnd());
+		}
+		
+		[Test()]
+		public void QuotedTextTests()	
+		{
+			Assert.IsNotNull(AnyText.ParseQuoted(NCS("this is fine")));
+			Assert.IsNotNull(AnyText.ParseQuoted(NCS("can be almost anything\nanother line")));
+			Assert.IsNotNull(AnyText.ParseQuoted(NCS("curly brackets to have be escaped like this: \\{")));
+			Assert.IsNotNull(AnyText.ParseQuoted(NCS("a quote has to be escaped like this: \\\"")));
+			
+			CharStream cs = NCS("otherwise {it will stop");
+			Assert.IsNotNull(AnyText.ParseQuoted(cs));
+			Assert.AreEqual("{it will stop", cs.ReadUntilEnd());
+
+			cs = NCS("otherwise \"it will stop");
+			Assert.IsNotNull(AnyText.ParseQuoted(cs));
+			Assert.AreEqual("\"it will stop", cs.ReadUntilEnd());
+		}
+		
+		[Test()]
+		public void BlockTextTests()	
+		{
+			// TODO : Fix this buggy parsing
+			// Also... we have a potential problem with block text,
+			// as a block text consists out of `| <unquoted-pattern>`
+			// and an unquoted-pattern can be a block, it means that
+			// a block-text of 3 lines, is 3 unquoted-patterns deep, rather than simply returning early
+			// this shouldn't really happen I think, as it is asking for trouble...
+			// need to find a way to fix this, without breaking l20n spec intentions.
+			/*
+			L20n.FTL.AST.INode result;
+			// good examples
+			Assert.IsTrue(AnyText.PeekAndParseBlock(NCS(@"
+				| this blocktext
+				| is fine"), out result));
+			Assert.IsTrue(AnyText.PeekAndParseBlock(NCS(@"
+| this blocktext is also fine"), out result));
+
+			// bad examples
+			// newline required
+			Assert.IsFalse(AnyText.PeekAndParseBlock(NCS(""), out result));
+			// | required
+			Assert.IsFalse(AnyText.PeekAndParseBlock(NCS(@"
+"), out result));*/
+		}
+
+		// BodyParser: TODO:
+		// Make sure that FTL files that end with no empty new line work as well
 
 		public static CharStream NCS(string buffer)
 		{

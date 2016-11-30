@@ -15,10 +15,10 @@ namespace L20n
 			/// </summary>
 			public static class Message
 			{
-				public static bool PeekAndParse(CharStream cs, Context ctx, out L20n.FTL.AST.INode comment)
+				public static bool PeekAndParse(CharStream cs, Context ctx, out L20n.FTL.AST.INode entity)
 				{
-					if(Identifier.PeekAndParse(cs, out comment)) {
-						comment = Parse(cs, ctx, comment as FTL.AST.StringPrimitive);
+					if(Identifier.PeekAndParse(cs, out entity)) {
+						entity = Parse(cs, ctx, entity as FTL.AST.StringPrimitive);
 						return true;
 					}
 
@@ -31,7 +31,24 @@ namespace L20n
 					cs.SkipCharacter('=');
 					WhiteSpace.PeekAndSkip(cs);
 
-					throw new NotImplementedException();
+
+					FTL.AST.Pattern pattern = null;
+					// check if we have a Pattern available
+					if(!CharStream.IsNL(cs.PeekNext())) {
+						pattern = Pattern.Parse(cs);
+					}
+
+					WhiteSpace.PeekAndSkip(cs);
+
+					NewLine.Skip(cs);
+					FTL.AST.MemberList memberList;
+					bool parsedMemberList = MemberList.PeekAndParse(cs, out memberList);
+					if(!parsedMemberList && pattern == null) {
+						cs.CreateException(
+							"member-list was epcted, as no pattern was found", null);
+					}
+
+					return new FTL.AST.Entity(identifier, pattern, memberList);
 				}
 			}
 		}

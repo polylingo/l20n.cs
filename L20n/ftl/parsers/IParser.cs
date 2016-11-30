@@ -16,6 +16,7 @@ namespace L20n
 			public interface IParser
 			{	
 				FTL.AST.Body Parse(CharStream cs, Context ctx);
+				string ParserName();
 			}
 		}
 	}

@@ -37,6 +37,7 @@ namespace L20n
 
 			public static readonly char NOP = '\0';
 			public static readonly char NL = '\n';
+			public static readonly char EOF = NOP;
 			
 			public static bool IsNL(char c)
 			{
@@ -78,7 +79,10 @@ namespace L20n
 			public char PeekNext()
 			{
 				try {
-					return (char)m_Stream.Peek();
+					int i = m_Stream.Peek();
+					if(i == -1)
+						return EOF;
+					return (char)i;
 				} catch(Exception e) {
 					throw CreateException("next character could not be peeked", e);
 				}

@@ -26,11 +26,14 @@ namespace L20n
 					while(Entry.PeekAndParse(cs, ctx, out entry)) {
 						if(entry != null) // could have been ommitted because of partial AST
 							root.AddEntry(entry);
-						if(!NewLine.PeekAndSkip(cs))
-							break;
 					}
 
 					return root;
+				}
+
+				public string ParserName()
+				{
+					return "Default FTL Parser";
 				}
 			}
 		}

@@ -11,21 +11,19 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a Comment.
-			/// More Information: <see cref="L20n.FTL.Parsers.Comment"/>
+			/// The AST representation for <block-text>.
+			/// More Information: <see cref="L20n.FTL.Parsers.BlockText"/>
 			/// </summary>
-			public sealed class Comment : INode
+			public sealed class BlockText : INode
 			{
 				/// <summary>
-				/// Initializes a new instance of the <see cref="L20n.FTL.AST.Comment"/> class.
+				/// Initializes a new instance of the <see cref="L20n.FTL.AST.BlockText"/> class.
 				/// </summary>
-				/// <param name="value">Value.</param>
-				public Comment(string value)
+				public BlockText()
 				{
-					m_Values = new List<string>(1);
-					m_Values.Add(value);
+					m_Lines = new List<INode>();
 				}
-
+				
 				/// <summary>
 				/// A comment is metadata, and thus optimization does not apply to it.
 				/// </summary>
@@ -39,20 +37,22 @@ namespace L20n
 				/// </summary>
 				public void Serialize(TextWriter writer)
 				{
-					for(int i = 0; i < m_Values.Count; ++i)
-						writer.Write("#" + m_Values[i] + "\n");
+					// write all lines, except last one
+					for(int i = 0; i < m_Lines.Count; ++i) {
+						writer.Write("\n | ");
+						m_Lines[i].Serialize(writer);
+					}
 				}
-
+				
 				/// <summary>
 				/// Appends the given comment on a new line to the existing comment.
 				/// </summary>
-				public void Merge(Comment otherComment)
+				public void AddLine(INode line)
 				{
-					for(int i = 0; i < otherComment.m_Values.Count; ++i)
-						m_Values.Add(otherComment.m_Values[i]);
+					m_Lines.Add(line);
 				}
 				
-				private List<string> m_Values; // one value per line
+				private List<INode> m_Lines; // one value per line
 			}
 		}
 	}

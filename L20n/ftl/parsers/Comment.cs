@@ -17,6 +17,7 @@ namespace L20n
 			{
 				public static bool PeekAndParse(CharStream cs, Context ctx, out FTL.AST.INode comment)
 				{
+					WhiteSpace.PeekAndSkip(cs);
 					if (cs.PeekNext() != '#')
 					{
 						comment = null;
@@ -36,15 +37,18 @@ namespace L20n
 				
 				private static FTL.AST.Comment Parse(CharStream cs)
 				{
+					WhiteSpace.PeekAndSkip(cs);
 					cs.SkipCharacter('#');
 					string value = cs.ReadWhile(IsNotNL);
+					NewLine.Skip(cs);
 					return new L20n.FTL.AST.Comment(value);
 				}
 				
-				private static void Skip(CharStream stream)
+				private static void Skip(CharStream cs)
 				{
-					stream.SkipCharacter('#');
-					stream.SkipWhile(IsNotNL);
+					cs.SkipCharacter('#');
+					cs.SkipWhile(IsNotNL);
+					NewLine.Skip(cs);
 				}
 
 				private static bool IsNotNL(char c)
