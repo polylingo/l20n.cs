@@ -1,9 +1,9 @@
 // Glen De Cauwsemaecker licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 using System;
-using System.IO;
 using System.Collections.Generic;
 
+using L20n.IO;
 using L20n.Exceptions;
 
 namespace L20n
@@ -46,7 +46,7 @@ namespace L20n
 				/// Writes its content and the content of its children.
 				/// In other words, this writes the entire FTL document.
 				/// </summary>
-				public void Serialize(TextWriter writer)
+				public void Serialize(Writer writer)
 				{
 					for(int i = 0; i < m_Entries.Count; ++i) {
 						m_Entries[i].Serialize(writer);

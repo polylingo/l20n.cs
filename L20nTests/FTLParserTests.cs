@@ -192,7 +192,7 @@ namespace L20nTests
 			Assert.IsNotNull(number);
 			Assert.AreEqual(rest, cs.ReadUntilEnd());
 
-			StringWriter writer = new StringWriter();
+			Writer writer = new Writer(new StringWriter());
 			number.Serialize(writer);
 			Assert.AreEqual(expected, writer.ToString());
 		}

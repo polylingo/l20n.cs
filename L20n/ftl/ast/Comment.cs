@@ -1,8 +1,9 @@
 // Glen De Cauwsemaecker licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 using System;
-using System.IO;
 using System.Collections.Generic;
+
+using L20n.IO;
 
 namespace L20n
 {
@@ -37,10 +38,10 @@ namespace L20n
 				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
-				public void Serialize(TextWriter writer)
+				public void Serialize(Writer writer)
 				{
 					for(int i = 0; i < m_Values.Count; ++i)
-						writer.Write("#" + m_Values[i] + "\n");
+						writer.Writeln("#" + m_Values[i]);
 				}
 
 				/// <summary>

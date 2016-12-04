@@ -84,6 +84,8 @@
     <Compile Include="ftl\ast\QuotedText.cs" />
     <Compile Include="ftl\ast\BlockText.cs" />
     <Compile Include="ftl\parsers\AnyText.cs" />
+    <Compile Include="io\Writer.cs" />
+    <Compile Include="exceptions\SerializeException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

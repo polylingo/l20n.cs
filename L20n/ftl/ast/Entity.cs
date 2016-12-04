@@ -1,7 +1,8 @@
 // Glen De Cauwsemaecker licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 using System;
-using System.IO;
+
+using L20n.IO;
 
 namespace L20n
 {
@@ -32,7 +33,7 @@ namespace L20n
 				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
-				public void Serialize(TextWriter writer)
+				public void Serialize(Writer writer)
 				{
 					// write the comment if one is attached to this message
 					if(m_Comment != null)
@@ -45,8 +46,7 @@ namespace L20n
 						m_Pattern.Serialize(writer);
 					if(m_MemberList != null)
 						m_MemberList.Serialize(writer);
-					writer.Write('\n');
-					throw new NotImplementedException();
+					writer.Writeln("");
 				}
 
 				/// <summary>
