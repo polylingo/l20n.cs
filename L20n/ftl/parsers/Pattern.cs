@@ -57,7 +57,7 @@ namespace L20n
 
 					do {
 						pattern.AddChild(child);
-						child = ParseUnquoted(cs);
+						child = ParseUnquotedChild(cs);
 					} while(child != null);
 
 					return pattern;
@@ -70,12 +70,13 @@ namespace L20n
 					if(Placeable.PeekAndParse(cs, out child))
 						return child;
 
-					if(AnyText.PeekAndParseBlock(cs, out child))
-						return child;
+					// [TODO] Fix Block
+					//if(AnyText.PeekAndParseBlock(cs, out child))
+					//	return child;
 
 					// as long as we don't have a newline char,
 					// we'll assume it's an unquoted-child
-					if(!CharStream.IsNL(cs.PeekNext()))
+					if(!cs.EndOfStream() && !CharStream.IsNL(cs.PeekNext()))
 						return AnyText.ParseUnquoted(cs);
 
 					// return null if no child could be found

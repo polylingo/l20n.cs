@@ -17,9 +17,12 @@ namespace L20n
 			{
 				public static FTL.AST.MemberList Parse(CharStream cs)
 				{
+					// starts with a newline
+					NewLine.Skip(cs);
+
+					FTL.AST.MemberList memberList = new FTL.AST.MemberList();
 					// parse first required member, as we always need at least 1
 					WhiteSpace.PeekAndSkip(cs);
-					FTL.AST.MemberList memberList = new FTL.AST.MemberList();
 					FTL.AST.Member member = Member.Parse(cs);
 					memberList.AddMember(member);
 					NewLine.Skip(cs);

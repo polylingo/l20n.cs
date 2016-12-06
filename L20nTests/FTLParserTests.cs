@@ -374,6 +374,42 @@ namespace L20nTests
 			Throws(() => Argument.Parse(NCS("")));
 		}
 
+		private void CheckValidPlaceable(string input, string rest = "")
+		{
+			var cs = NCS(input);
+			L20n.FTL.AST.INode result;
+			Assert.IsTrue(Placeable.PeekAndParse(cs, out result));
+			Assert.IsNotNull(result);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(L20n.FTL.AST.Placeable), result.GetType());
+		}
+		
+		[Test()]
+		public void PlaceableTests()
+		{
+			// Expression
+			CheckValidPlaceable("{ Foo }");
+			CheckValidPlaceable("{ foo[bar] }");
+			CheckValidPlaceable("{ $variable }");
+			CheckValidPlaceable("{ \"value\" }");
+			CheckValidPlaceable("{ 42 }");
+
+			// Expressions
+			CheckValidPlaceable("{ Foo, foo[bar], $variable, \"value\", 42 }");
+
+			// SelectExpression
+			CheckValidPlaceable(@"{ $count ->
+				[0] There are no items :(
+				[1] There is one item :|
+				*[other] { $variable ->
+					[a] something related to a
+					[b] something related to b
+				}
+			}");
+			
+			// for more examples check the different types of expressions
+		}
+
 		[Test()]
 		public void UnquotedTextTests()	
 		{
@@ -428,6 +464,54 @@ namespace L20nTests
 			// | required
 			Assert.IsFalse(AnyText.PeekAndParseBlock(NCS(@"
 "), out result));*/
+		}
+
+		private void checkValidMemberkey<T>(string input, string rest = "")
+		{
+			var cs = NCS(input);
+			var memberKey = Memberkey.Parse(cs);
+			Assert.IsNotNull(memberKey);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(T), memberKey.GetType());
+		}
+
+		[Test()]
+		public void MemberKeyTests()
+		{
+			// the three possible MemberKeys
+			checkValidMemberkey<L20n.FTL.AST.StringPrimitive>("keyword");
+			checkValidMemberkey<L20n.FTL.AST.Attribute>("identifier/keyword");
+			checkValidMemberkey<L20n.FTL.AST.Number>("42");
+
+			// some invalid examples
+			Throws(() => Memberkey.Parse(NCS("@#")));
+
+			// for more examples check the individual types (keyword, identifier and number)
+		}
+
+		private void checkValidMember(string input, string rest = "")
+		{
+			var cs = NCS(input);
+			var member = Member.Parse(cs);
+			Assert.IsNotNull(member);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(L20n.FTL.AST.Member), member.GetType());
+		}
+
+		[Test()]
+		public void MemberTests()
+		{
+			checkValidMember("[keyword] something");
+			checkValidMember("[0] no items");
+			checkValidMember("[0] \"still no items\"");
+			checkValidMember("[ui/desc] Hello, { $username }!");
+			checkValidMember("[other] You have now { $count } items!");
+		}
+
+		[Test()]
+		public void MessageTests()
+		{
+			// TODO
 		}
 
 		// BodyParser: TODO:

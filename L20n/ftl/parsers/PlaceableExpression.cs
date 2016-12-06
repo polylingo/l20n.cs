@@ -28,7 +28,7 @@ namespace L20n
 					// it must be a select expression
 					
 					// make sure we have at least 1 space
-					if(wsSkipped) {
+					if(!wsSkipped) {
 						throw cs.CreateException(String.Format(
 							"require at least 1 space before '{0}' in a select-expression", SEPERATOR), null);
 					}

@@ -18,6 +18,8 @@ namespace L20n
 			{
 				public static bool PeekAndParse(CharStream cs, Context ctx, out L20n.FTL.AST.INode result)
 				{
+					WhiteSpace.PeekAndSkip(cs);
+
 					if (Message.PeekAndParse(cs, ctx, out result))
 						return true;
 					
