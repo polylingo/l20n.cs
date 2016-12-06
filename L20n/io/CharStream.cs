@@ -56,6 +56,8 @@ namespace L20n
 				m_NewLineStartPosition = 0;
 				m_Buffer = new List<char>();
 				m_BufferBlock = new char[8];
+				m_StreamBuffer = new Queue<char>();
+				m_IsBuffering = false;
 			}
 						
 			/// <summary>
@@ -71,6 +73,8 @@ namespace L20n
 				m_NewLineStartPosition = 0;
 				m_Buffer = new List<char>();
 				m_BufferBlock = new char[8];
+				m_StreamBuffer = new Queue<char>();
+				m_IsBuffering = false;
 			}
 			
 			/// <summary>
@@ -79,6 +83,9 @@ namespace L20n
 			public char PeekNext()
 			{
 				try {
+					if(!m_IsBuffering && m_StreamBuffer.Count > 0)
+						return m_StreamBuffer.Peek();
+
 					int i = m_Stream.Peek();
 					if(i == -1)
 						return EOF;
@@ -98,6 +105,9 @@ namespace L20n
 			{
 				try {
 					++m_Position;
+					if(!m_IsBuffering && m_StreamBuffer.Count > 0)
+						return m_StreamBuffer.Dequeue();
+
 					int i = m_Stream.Read();
 					if(i == -1) {
 						throw CreateException("EOF reached, while this was not expected", null);
@@ -105,7 +115,7 @@ namespace L20n
 
 					char next = (char)i;
 					if(next == '\r') {
-						if(PeekNext() == NL) {
+						if(PeekNext() == '\n') {
 							next = (char)m_Stream.Read(); // we count '\r\n' as 1 char
 						}
 					}
@@ -114,6 +124,9 @@ namespace L20n
 						m_NewLineCount++;
 						m_NewLineStartPosition = m_Position;
 					}
+
+					if(m_IsBuffering)
+						m_StreamBuffer.Enqueue(next);
 
 					return next;
 				} catch(Exception e) {
@@ -144,6 +157,21 @@ namespace L20n
 					m_Buffer.Add(ReadNext());
 				return new string(m_Buffer.ToArray());
 			}
+
+			/// <summary>
+			/// Reads an entire line.
+			/// </summary>
+			/// <remarks>
+			/// The newline character of the line is skipped if it exists,
+			/// but is not part of the returned string.
+			/// </remarks>
+			public string ReadLine()
+			{
+				string output = ReadUntil(IsNL);
+				if(!EndOfStream()) // a line could also be the last char
+					SkipNext(); // skip next newline character
+				return output;
+			}
 			
 			/// <summary>
 			/// Reads until EOF is reached or
@@ -158,24 +186,13 @@ namespace L20n
 			}
 
 			/// <summary>
-			/// Reads an entire line.
+			/// Reads the stream until the end.
 			/// </summary>
-			public string ReadLine()
-			{
-				string output = m_Stream.ReadLine();
-				if(output != null) {
-					m_Position += output.Length + 1;
-					++m_NewLineCount;
-					m_NewLineStartPosition = m_Position;
-				}
-
-				return output;
-			}
-
 			public string ReadUntilEnd()
 			{
 				try {
-					string s = m_Stream.ReadToEnd();
+					string s = new string(m_StreamBuffer.ToArray()) + m_Stream.ReadToEnd();
+					FlushBuffer();
 					if(s != null) {
 						m_Position += s.Length;
 
@@ -268,6 +285,34 @@ namespace L20n
 				for(int i = 0; i < expected.Length; ++i)
 					SkipCharacter(expected[i]);
 			}
+
+			/// <summary>
+			/// Flushes whatever was left in the StreamBuffer.
+			/// </summary>
+			public void FlushBuffer()
+			{
+				m_StreamBuffer.Clear();
+			}
+
+			/// <summary>
+			/// Starts buffering the content that's read and skipped.
+			/// No buffered content is ever returned while it is still buffering.
+			/// </summary>
+			public void StartBuffering()
+			{
+				m_IsBuffering = true;
+			}
+
+			/// <summary>
+			/// Stops buffering content that's read and skipped.
+			/// Note that if the buffer is not flushed,
+			/// content that has previously been skipped and read will be
+			/// returned while skipping/reading from the stream.
+			/// </summary>
+			public void StopBuffering()
+			{
+				m_IsBuffering = false;
+			}
 						
 			/// <summary>
 			/// Returns <c>true</c> if the stream has no more characters left,
@@ -275,7 +320,7 @@ namespace L20n
 			/// </summary>
 			public bool EndOfStream()
 			{
-				return m_Stream.EndOfStream;
+				return (m_IsBuffering || m_StreamBuffer.Count == 0) && m_Stream.EndOfStream;
 			}
 						
 			/// <summary>
@@ -325,6 +370,10 @@ namespace L20n
 			// a buffer used when reading an unknown amount of characters
 			private List<char> m_Buffer;
 			private char[] m_BufferBlock;
+
+			// used for when we might need to go back in time at some point
+			private bool m_IsBuffering;
+			private Queue<char> m_StreamBuffer;
 		}
 	}
 }

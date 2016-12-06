@@ -76,7 +76,8 @@ namespace L20n
 
 					// as long as we don't have a newline char,
 					// we'll assume it's an unquoted-child
-					if(!cs.EndOfStream() && !CharStream.IsNL(cs.PeekNext()))
+					char next = cs.PeekNext();
+					if(next != CharStream.EOF && !CharStream.IsNL(next))
 						return AnyText.ParseUnquoted(cs);
 
 					// return null if no child could be found

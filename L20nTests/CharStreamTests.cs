@@ -167,6 +167,37 @@ namespace L20nTests
 		}
 
 		[Test()]
+		public void StreamBufferTests()
+		{
+			var cs = NCS("abcde\r\nfghijk\nlmnopq");
+			cs.StartBuffering();
+			Assert.AreEqual("abcde", cs.ReadLine());
+			cs.StopBuffering();
+			// the old buffered content is still there (didn't flush)
+			Assert.AreEqual("abcde", cs.ReadLine());
+			cs.StartBuffering();
+			Assert.AreEqual("fghijk", cs.ReadLine());
+			cs.StopBuffering();
+			Assert.AreEqual('f', cs.PeekNext());
+			Assert.AreEqual('f', cs.PeekNext());
+			cs.FlushBuffer();
+			Assert.AreEqual('l', cs.PeekNext());
+			// this time we have flushed,
+			// as one would do in case a certain condition is fine
+			// so we actually read new content
+			cs.StartBuffering();
+			Assert.AreEqual("lmnopq", cs.ReadLine());
+			// stream is finished, and we're still buffering
+			Assert.IsTrue(cs.EndOfStream());
+			cs.StopBuffering();
+			// stopped buffering, stream is ended but buffer has still content
+			Assert.IsFalse(cs.EndOfStream());
+			cs.FlushBuffer();
+			// not buffering, stream is ended and buffer is empty
+			Assert.IsTrue(cs.EndOfStream());
+		}
+
+		[Test()]
 		public void ExceptionTests()
 		{
 			// EOF while character was expected
