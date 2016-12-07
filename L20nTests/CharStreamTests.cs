@@ -25,66 +25,46 @@ namespace L20nTests
 		[Test()]
 		public void EmptyFile()
 		{
-			var cs = new CharStream("../../resources/io/Empty.txt");
-			Assert.AreEqual("L1:1", cs.ComputeDetailedPosition());
+			var streamReader = StreamReaderFactory.Create("../../resources/io/Empty.txt");
+			var cs = new CharStream(streamReader);
 			Assert.IsTrue(cs.EndOfStream());
 		}
 
 		[Test()]
 		public void CharStreamFile()
 		{
-			var cs = new CharStream("../../resources/io/CharStream.txt");
-			Assert.AreEqual("L1:1", cs.ComputeDetailedPosition());
+			var streamReader = StreamReaderFactory.Create("../../resources/io/CharStream.txt");
+			var cs = new CharStream(streamReader);
 
 			Assert.AreEqual('H', cs.PeekNext());
 			Assert.AreEqual("Hello, World!", cs.ReadLine());
-			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
 			Assert.AreEqual("你好，世界！", cs.ReadLine());
-			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
-			Assert.AreEqual("L4:1", cs.ComputeDetailedPosition());
 			Assert.AreEqual("Chào thế giới!", cs.ReadLine());
-			Assert.AreEqual("L5:1", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
-			Assert.AreEqual("L6:1", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
-			Assert.AreEqual("L7:1", cs.ComputeDetailedPosition());
 
 			Assert.AreEqual("foo", cs.ReadWhile((c) => Char.IsLetter((char)c)));
-			Assert.AreEqual("L7:4", cs.ComputeDetailedPosition());
 			Assert.AreEqual("123", cs.ReadWhile((c) => Char.IsDigit((char)c)));
-			Assert.AreEqual("L7:7", cs.ComputeDetailedPosition());
 			cs.SkipCharacter(' ');
 			Assert.AreEqual('b', cs.PeekNext());
-			Assert.AreEqual("L7:8", cs.ComputeDetailedPosition());
 			cs.SkipNext(); // b
 			Assert.AreEqual('a', cs.PeekNext());
-			Assert.AreEqual("L7:9", cs.ComputeDetailedPosition());
 			cs.SkipCharacter('a');
-			Assert.AreEqual("L7:10", cs.ComputeDetailedPosition());
 			Assert.AreEqual('r', cs.ReadNext());
-			Assert.AreEqual("L7:11", cs.ComputeDetailedPosition());
 			cs.SkipNext(); // \n
-			Assert.AreEqual("L8:1", cs.ComputeDetailedPosition());
 
 			Assert.AreEqual("こんにちは世界！", cs.ReadLine());
-			Assert.AreEqual("L9:1", cs.ComputeDetailedPosition());
 
 			// read 1 line
-			Assert.AreEqual(1, cs.SkipWhile((c) => c == CharStream.NL));
-			Assert.AreEqual("L10:1", cs.ComputeDetailedPosition());
+			Assert.AreEqual(1, cs.SkipWhile(CharStream.IsNL));
 
 			// Read mix between ASCII (dsl) and unicode (locale)
 			cs.SkipCharacter('<');
-			Assert.AreEqual("L10:2", cs.ComputeDetailedPosition());
 			Assert.AreEqual("hello", cs.ReadWhile(char.IsLetter));
-			Assert.AreEqual("L10:7", cs.ComputeDetailedPosition());
 			cs.SkipString(" \"");
-			Assert.AreEqual("L10:9", cs.ComputeDetailedPosition());
 			Assert.AreEqual("你好", cs.ReadWhile((c) => c != '"'));
-			Assert.AreEqual("L10:11", cs.ComputeDetailedPosition());
 			Assert.AreEqual("\">", cs.ReadLine());
-			Assert.AreEqual("L11:1", cs.ComputeDetailedPosition());
 
 			// empty seperator line
 			Assert.IsEmpty(cs.ReadLine());
@@ -92,7 +72,6 @@ namespace L20nTests
 			// making sure we're still correct
 			Assert.AreEqual('0', cs.PeekNext());
 			Assert.AreEqual('0', cs.PeekNext());
-			Assert.AreEqual("L12:1", cs.ComputeDetailedPosition());
 
 			int pos = 0;
 			while(char.IsDigit(cs.PeekNext())) {
@@ -101,30 +80,23 @@ namespace L20nTests
 					break; // early exit
 				cs.SkipCharacter(',');
 			}
-			Assert.AreEqual("L12:11", cs.ComputeDetailedPosition());
 			Assert.AreEqual('a', cs.PeekNext());
 			cs.SkipBlock(2); // a,
-			Assert.AreEqual("L12:13", cs.ComputeDetailedPosition());
 			while(char.IsDigit(cs.PeekNext())) {
 				cs.SkipCharacter((pos++).ToString()[0]);
 				if(cs.PeekNext() != ',')
 					break; // early exit
 				cs.SkipCharacter(',');
 			}
-			Assert.AreEqual("L12:22", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
 			Assert.IsEmpty(cs.ReadLine());
 
 			cs.SkipString("[[");
-			Assert.AreEqual("L14:3", cs.ComputeDetailedPosition());
 			Assert.AreEqual("end", cs.ReadBlock(3));
-			Assert.AreEqual("L14:6", cs.ComputeDetailedPosition());
 			cs.SkipString("]]");
-			Assert.AreEqual("L14:8", cs.ComputeDetailedPosition());
 			Assert.IsEmpty(cs.ReadLine());
 
 			Assert.AreEqual("\nor is it?\n", cs.ReadUntilEnd());
-			Assert.AreEqual("L17:1", cs.ComputeDetailedPosition());
 
 			Assert.IsTrue(cs.EndOfStream());
 		}
@@ -169,44 +141,18 @@ namespace L20nTests
 		[Test()]
 		public void StreamBufferTests()
 		{
-			var cs = NCS("abcde\r\nfghijk\nlmnopq");
-			Assert.AreEqual("L1:1", cs.ComputeDetailedPosition());
-			cs.StartBuffering();
+			var cs = NCS("abcde\r\nfghijk");
+			int pos = cs.Position;
+			Assert.AreEqual(0, pos);
+			for(int i = 0; i < 5; ++i) {
+				Assert.AreEqual("abcde", cs.ReadLine());
+				Assert.AreEqual(7, cs.Position);
+				cs.Rewind(pos);
+				Assert.AreEqual(0, cs.Position);
+			}
+
 			Assert.AreEqual("abcde", cs.ReadLine());
-			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
-			cs.StopBuffering();
-			Assert.AreEqual("L1:1", cs.ComputeDetailedPosition());
-			// the old buffered content is still there (didn't flush)
-			Assert.AreEqual("abcde", cs.ReadLine());
-			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
-			cs.StartBuffering();
 			Assert.AreEqual("fghijk", cs.ReadLine());
-			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
-			cs.StopBuffering();
-			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
-			Assert.AreEqual('f', cs.PeekNext());
-			Assert.AreEqual('f', cs.PeekNext());
-			Assert.AreEqual('l', cs.PeekNextUnbuffered());
-			cs.FlushBuffer();
-			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
-			Assert.AreEqual('l', cs.PeekNext());
-			// this time we have flushed,
-			// as one would do in case a certain condition is fine
-			// so we actually read new content
-			cs.StartBuffering();
-			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
-			Assert.AreEqual("lmnopq", cs.ReadLine());
-			Assert.AreEqual("L3:7", cs.ComputeDetailedPosition());
-			// stream is finished, and we're still buffering
-			Assert.IsTrue(cs.EndOfStream());
-			cs.StopBuffering();
-			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
-			// stopped buffering, stream is ended but buffer has still content
-			Assert.IsFalse(cs.EndOfStream());
-			cs.FlushBuffer();
-			Assert.AreEqual("L3:7", cs.ComputeDetailedPosition());
-			// not buffering, stream is ended and buffer is empty
-			Assert.IsTrue(cs.EndOfStream());
 		}
 
 		[Test()]

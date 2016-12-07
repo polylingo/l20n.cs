@@ -29,6 +29,7 @@ namespace L20n
 				/// </summary>
 				public StringPrimitive(string value)
 				{
+					Console.WriteLine(value);
 					m_Value = value;
 				}
 

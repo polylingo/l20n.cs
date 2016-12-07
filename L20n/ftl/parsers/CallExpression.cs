@@ -23,8 +23,7 @@ namespace L20n
 					if(!Builtin.IsValid(builtin.Value)) {
 						throw cs.CreateException(
 							string.Format("{0} is not a valid builtin, while one was expected", builtin.Value),
-							null,
-							builtin.Value.Length * -1);
+							null);
 					}
 
 					cs.SkipCharacter(PREFIX);

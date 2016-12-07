@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 using L20n.Exceptions;
 using System.Text;
+using System.CodeDom.Compiler;
+using System.CodeDom;
 
 namespace L20n
 {
@@ -20,28 +22,22 @@ namespace L20n
 		/// This class is not thread-safe, and should not be used in concurrent environments.
 		/// </remarks>
 		public class CharStream : IDisposable
-		{
+		{	
 			/// <summary>
-			/// Returns the path to the actual resources this instance is streaming.
-			/// </summary>
-			public string Path {
-				get { return m_Path; }
-			}
-						
-			/// <summary>
-			/// Returns the current position in the stream.
+			/// Returns the current buffer position in the stream.
 			/// </summary>
 			public int Position {
-				get { return m_Position; }
+				get { return m_Stream.GetBufferPosition(); }
 			}
-
-			public static readonly char NOP = '\0';
-			public static readonly char NL = '\n';
-			public static readonly char EOF = NOP;
 			
 			public static bool IsNL(char c)
 			{
 				return c == '\r' || c == '\n';
+			}
+
+			public static bool IsEOF(char c)
+			{
+				return c == '\0';
 			}
 						
 			/// <summary>
@@ -49,32 +45,9 @@ namespace L20n
 			/// </summary>
 			public CharStream(StreamReader stream, string path = null)
 			{
-				m_Path = path;
-				m_Stream = stream;
-				m_Position = 0;
-				m_NewLineCount = 0;
-				m_NewLineStartPosition = 0;
+				m_Stream = new BufferedStreamReader(stream);
 				m_Buffer = new List<char>();
 				m_BufferBlock = new char[8];
-				m_StreamBuffer = new Queue<char>();
-				m_IsBuffering = false;
-			}
-						
-			/// <summary>
-			/// Creates a <see cref="L20n.IO.CharStream"/> instance with the buffered content
-			/// read from the resource found at the given path.
-			/// </summary>
-			public CharStream(String path)
-			{
-				m_Path = path;
-				m_Stream = StreamReaderFactory.Create(path);
-				m_Position = 0;
-				m_NewLineCount = 0;
-				m_NewLineStartPosition = 0;
-				m_Buffer = new List<char>();
-				m_BufferBlock = new char[8];
-				m_StreamBuffer = new Queue<char>();
-				m_IsBuffering = false;
 			}
 			
 			/// <summary>
@@ -82,32 +55,7 @@ namespace L20n
 			/// </summary>
 			public char PeekNext()
 			{
-				try {
-					if(!m_IsBuffering && m_StreamBuffer.Count > 0)
-						return m_StreamBuffer.Peek();
-
-					int i = m_Stream.Peek();
-					if(i == -1)
-						return EOF;
-					return (char)i;
-				} catch(Exception e) {
-					throw CreateException("next character could not be peeked", e);
-				}
-			}
-			
-			/// <summary>
-			/// Peeks the next unbuffered Character.
-			/// </summary>
-			public char PeekNextUnbuffered()
-			{
-				try {
-					int i = m_Stream.Peek();
-					if(i == -1)
-						return EOF;
-					return (char)i;
-				} catch(Exception e) {
-					throw CreateException("next character could not be peeked", e);
-				}
+				return m_Stream.PeekNext();
 			}
 			
 			/// <summary>
@@ -118,37 +66,7 @@ namespace L20n
 			/// </remarks>
 			public char ReadNext()
 			{
-				try {
-					char next;
-
-					if(!m_IsBuffering && m_StreamBuffer.Count > 0) { // read from streamBuffer
-						next = m_StreamBuffer.Dequeue();
-					} else { // read from stream
-						int i = m_Stream.Read();
-						if(i == -1) {
-							throw CreateException("EOF reached, while this was not expected", null);
-						}
-
-						next = (char)i;
-
-						// check if we have a carriage return,
-						// if so we might be dealing with a newline WindowsTM combinaton
-						// we only have to check this when reading from the actual stream,
-						// as we're storing the combination as '\n' in the buffer.
-						if(next == '\r' && PeekNext() == '\n')
-							next = (char) m_Stream.Read();
-					}
-
-					// in case we're buffering, add the char to the stream
-					if(m_IsBuffering)
-						m_StreamBuffer.Enqueue(next);
-
-					MovePosition(next);
-
-					return next;
-				} catch(Exception e) {
-					throw CreateException("next character could not be read", e);
-				}
+				return m_Stream.ReadNext();
 			}
 
 			/// <summary>
@@ -185,8 +103,15 @@ namespace L20n
 			public string ReadLine()
 			{
 				string output = ReadUntil(IsNL);
-				if(!EndOfStream()) // a line could also be the last char
-					SkipNext(); // skip next newline character
+				char next = PeekNext();
+				if(next == '\n') {
+					SkipNext();
+				} else if(next == '\r') {
+					SkipNext();
+					if(PeekNext() == '\n')
+						SkipNext();
+				}
+
 				return output;
 			}
 			
@@ -207,15 +132,7 @@ namespace L20n
 			/// </summary>
 			public string ReadUntilEnd()
 			{
-				try {
-					string s = new string(m_StreamBuffer.ToArray()) + m_Stream.ReadToEnd();
-					m_StreamBuffer.Clear();
-					if(s != null)
-						MovePosition(s.ToCharArray());
-					return s;
-				} catch(Exception e) {
-					throw CreateException("could not read until end", e);
-				}
+				return m_Stream.ReadUntilEnd();
 			}
 
 			/// <summary>
@@ -240,10 +157,16 @@ namespace L20n
 			/// </summary>
 			public void SkipCharacter(char expected)
 			{
-				char next = ReadNext();
-				if(next != expected)
-					throw CreateException(
-						string.Format("next character was {0}, while {1} was expected", next, expected), null, -1);
+				char next = PeekNext();
+				if(next != expected) {
+					string nextout = next.ToString();
+					if(next == '\0')
+						nextout = "EOF";
+
+					string msg = string.Format(@"next character was `{0}`, while `{1}` was expected", nextout, expected);
+					throw CreateException(msg , null);
+				}
+				SkipNext();
 			}
 
 			/// <summary>
@@ -285,88 +208,20 @@ namespace L20n
 			}
 
 			/// <summary>
-			/// Moves the position and relevant information based
-			/// on the currently read character.
+			/// Rewinds the internal stream.
+			/// Note that the given position is the buffer position.
 			/// </summary>
-			private void MovePosition(char c)
+			public void Rewind(int pos)
 			{
-				++m_Position;
-
-				if(IsNL(c)) {
-					m_NewLineCount++;
-					m_NewLineStartPosition = m_Position;
-				}
-			}
-
-			/// <summary>
-			/// Moves the position and relevant information based
-			/// on the currently read characters.
-			/// </summary>
-			private void MovePosition(char[] s)
-			{
-				m_Position += s.Length;
-				
-				for(int i = 0; i < s.Length; ++i) {
-					if(s[i] == '\n') {
-						++m_NewLineCount;
-						m_NewLineStartPosition = m_Position;
-						continue;
-					}
-					
-					if(s[i] == '\r') {
-						if(i < s.Length - 1 && s[i + 1] == '\n') {
-							++i;
-						}
-						
-						++m_NewLineCount;
-						m_NewLineStartPosition = m_Position;
-					}
-				}
+				m_Stream.RewindBuffer(pos);
 			}
 
 			/// <summary>
 			/// Flushes whatever was left in the StreamBuffer.
 			/// </summary>
-			public void FlushBuffer()
+			public void FlushStreamBuffer()
 			{
-				MovePosition(m_StreamBuffer.ToArray());
-				m_StreamBuffer.Clear();
-			}
-
-			/// <summary>
-			/// Starts buffering the content that's read and skipped.
-			/// No buffered content is ever returned while it is still buffering.
-			/// </summary>
-			public void StartBuffering()
-			{
-				if(m_IsBuffering)
-					throw new Exception("buffering already started");
-
-				if(m_StreamBuffer.Count > 0)
-					MovePosition(m_StreamBuffer.ToArray());
-				
-				m_IsBuffering = true;
-				m_BufferPosition = m_Position;
-				m_BufferNewLineCount = m_NewLineCount;
-				m_BufferNewLineStartPosition = m_NewLineStartPosition;
-
-			}
-
-			/// <summary>
-			/// Stops buffering content that's read and skipped.
-			/// Note that if the buffer is not flushed,
-			/// content that has previously been skipped and read will be
-			/// returned while skipping/reading from the stream.
-			/// </summary>
-			public void StopBuffering()
-			{
-				if(!m_IsBuffering)
-					throw new Exception("buffering already stopped");
-
-				m_IsBuffering = false;
-				m_Position = m_BufferPosition;
-				m_NewLineCount = m_BufferNewLineCount;
-				m_NewLineStartPosition = m_BufferNewLineStartPosition;
+				m_Stream.FlushBuffer();
 			}
 						
 			/// <summary>
@@ -375,30 +230,17 @@ namespace L20n
 			/// </summary>
 			public bool EndOfStream()
 			{
-				return (m_IsBuffering || m_StreamBuffer.Count == 0) && m_Stream.EndOfStream;
-			}
-						
-			/// <summary>
-			/// Computes a user-friendly position that gives both the Line and Column number,
-			/// based on the given linear stream position.
-			/// Result gets returned in a formatted string.
-			/// </summary>
-			public string ComputeDetailedPosition(int offset = 0)
-			{
-				int lineNumber = m_NewLineCount;
-				int linePosition = (m_Position + offset) - m_NewLineStartPosition;
-				return String.Format("L{0}:{1}", lineNumber + 1, linePosition + 1); // 1-based
+				return m_Stream.EndOfStream();
 			}
 						
 			/// <summary>
 			/// Returns an exception with a given or default message,
 			/// for either the current or offset position.
 			/// </summary>
-			public ParseException CreateException(string msg, Exception e, int offset = 0)
+			public ParseException CreateException(string msg, Exception e)
 			{
 				return new ParseException(
-					String.Format("unexpected situation at {0}: {1}",
-						ComputeDetailedPosition(offset), msg), e);
+					String.Format("Parse Exception: {0}", ToLiteral(msg)), e);
 			}
 						
 			/// <summary>
@@ -408,30 +250,27 @@ namespace L20n
 			{
 				m_Buffer.Clear();
 			}
+
+			private static string ToLiteral(string input)
+			{
+				using (var writer = new StringWriter())
+				{
+					using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+					{
+						provider.GenerateCodeFromExpression(new CodePrimitiveExpression(input), writer, null);
+						return writer.ToString();
+					}
+				}
+			}
 						
 			// used to allow the user of this class to define its own predicate given a char.
 			public delegate bool CharPredicate(char c);
 						
-			// the path to the resource to be streamed
-			private readonly string m_Path = null;
 			// the buffer object containing all the chars to be "streamed"
-			private StreamReader m_Stream = null;
-			// the current position in the buffer
-			private int m_Position;
-			// the start position on the current line
-			private int m_NewLineStartPosition;
-			// the current amount of newlines
-			private int m_NewLineCount;
+			private BufferedStreamReader m_Stream = null;
 			// a buffer used when reading an unknown amount of characters
 			private List<char> m_Buffer;
 			private char[] m_BufferBlock;
-
-			// used for when we might need to go back in time at some point
-			private bool m_IsBuffering;
-			private int m_BufferPosition;
-			private int m_BufferNewLineStartPosition;
-			private int m_BufferNewLineCount;
-			private Queue<char> m_StreamBuffer;
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace L20n
 			/// <summary>
 			/// The combinator parser used to parse an entry.
 			/// 
-			/// message | comment | sectioN
+			/// message | comment | section
 			/// </summary>
 			public static class Entry
 			{

@@ -27,20 +27,19 @@ namespace L20n
 					// if it's an identifier, it could be either simply be an identifier,
 					// or it could actually be a keyword-argument
 					if(Identifier.PeekAndParse(cs, out result)) {
-						// make sure we buffer, so that we can put it back in case we realize
-						// it is not a keyword-argument after all
-						cs.StartBuffering();
+
+						int bufferPos = cs.Position;
 						// ignore any whitespace
 						WhiteSpace.Parse(cs);
-						cs.StopBuffering();
-							
+
 						// if we now encounter a `=` char, we'll assume it's a keyword-argument,
 						// and finish the parsing of that element,
 						// otherwise we'll assume it's simply an identifier and return early
-						if(cs.PeekNextUnbuffered() != '=')
+						if(cs.PeekNext() != '=') {
+							cs.Rewind(bufferPos);
 							return Expresson.ParseWithIdentifier(cs, result as FTL.AST.StringPrimitive);
+						}
 
-						cs.FlushBuffer(); // flush the whitespace
 						cs.SkipNext();
 						WhiteSpace.Parse(cs);
 							

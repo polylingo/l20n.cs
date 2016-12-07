@@ -39,6 +39,8 @@
   <ItemGroup>
     <Compile Include="CharStreamTests.cs" />
     <Compile Include="FTLParserTests.cs" />
+    <Compile Include="BuffferStreamReaderTests.cs" />
+    <Compile Include="BodyReflectionTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

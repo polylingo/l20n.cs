@@ -45,10 +45,11 @@ namespace L20n
 				/// </summary>
 				public void Serialize(Writer writer)
 				{
-					writer.Writeln("");
 					writer.IncreaseIndention();
-					for(int i = 0; i < m_Members.Count; ++i)
+					for(int i = 0; i < m_Members.Count; ++i) {
+						writer.Writeln("");
 						m_Members[i].Serialize(writer);
+					}
 					writer.DecreaseIndention();
 				}
 

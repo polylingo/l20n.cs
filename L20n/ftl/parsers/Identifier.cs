@@ -22,8 +22,7 @@ namespace L20n
 					char prefix = cs.ReadNext();
 					if(!IsValidPrefix(prefix)) {
 						throw cs.CreateException(
-							String.Format("{0} is not a valid first character", prefix),
-							null, -1);
+							String.Format("{0} is not a valid first character of an identifier", prefix), null);
 					}
 					
 					string value = prefix + cs.ReadWhile(PostfixPredicate);

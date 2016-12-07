@@ -39,12 +39,14 @@ namespace L20n
 				public void Serialize(Writer writer)
 				{
 					// write all lines, except last one
+					writer.IncreaseIndention();
 					for(int i = 0; i < m_Lines.Count; ++i) {
 						writer.Writeln("");
 						writer.WriteIndention();
 						writer.Write("| ");
 						m_Lines[i].Serialize(writer);
 					}
+					writer.DecreaseIndention();
 				}
 				
 				/// <summary>

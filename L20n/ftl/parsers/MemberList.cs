@@ -19,31 +19,33 @@ namespace L20n
 			{
 				public static FTL.AST.MemberList Parse(CharStream cs)
 				{
-					// starts with a newline
+					// starts with a newline and optional newline
 					NewLine.Parse(cs);
+					WhiteSpace.Parse(cs);
 
 					FTL.AST.MemberList memberList = new FTL.AST.MemberList();
 					// parse first required member, as we always need at least 1
-					FTL.AST.Member member = Member.Parse(cs);
+					memberList.AddMember(Member.Parse(cs));
 
 					char next;
-					while(member != null) {
-						memberList.AddMember(member);
+					int bufferPos;
+
+					do {
 						next = cs.PeekNext();
-						if(next == CharStream.EOF || !CharStream.IsNL(next))
+						if(CharStream.IsEOF(next) || !CharStream.IsNL(next))
 							break;
 
-						cs.StartBuffering();
-						//NewLine.Parse(cs);
-						cs.StopBuffering();
+						bufferPos = cs.Position;
+						NewLine.Parse(cs);
+						WhiteSpace.Parse(cs);
 
 						if(!Member.Peek(cs)) {
-							member = null;
-						} else {
-							cs.FlushBuffer();
-							member = Member.Parse(cs);
+							cs.Rewind(bufferPos);
+							break;
 						}
-					}
+
+						memberList.AddMember(Member.Parse(cs));
+					} while(true);
 
 					return memberList;
 				}
@@ -52,17 +54,20 @@ namespace L20n
 				{
 					// if next char is not a newline, we can just as well skip already
 					char next = cs.PeekNext();
-					if(next == CharStream.EOF || !CharStream.IsNL(next)) {
+					if(CharStream.IsEOF(next) || !CharStream.IsNL(next)) {
 						memberList = null;
 						return false;
 					}
 
 					// let's keep peeking further, requiring our buffer
-					cs.StartBuffering();
+					int bufferPos = cs.Position;
 					NewLine.Parse(cs);
-					cs.StopBuffering();
+					WhiteSpace.Parse(cs);
+					// we'll always want to rewind no matter what
+					bool isMemberList = Member.Peek(cs);
+					cs.Rewind(bufferPos);
 
-					if(Member.Peek(cs)) {
+					if(isMemberList) {
 						memberList = Parse(cs);
 						return true;
 					}

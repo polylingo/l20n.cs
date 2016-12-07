@@ -21,14 +21,9 @@ namespace L20n
 			{
 				public static void Parse(CharStream cs)
 				{
-					if(cs.SkipWhile(IsNewLine) <= 0)
+					if(cs.SkipWhile(CharStream.IsNL) == 0)
 						throw cs.CreateException(
 							"at least one newline character is required", null);
-				}
-				
-				private static bool IsNewLine(char c)
-				{
-					return c == '\r' || c == '\n';
 				}
 			}
 		}

@@ -53,7 +53,7 @@ namespace L20n
 
 				private static bool Predicate(char c)
 				{
-					return c != CharStream.EOF && c != '\n' && c != '\r';
+					return !CharStream.IsEOF(c) && !CharStream.IsNL(c);
 				}
 			}
 		}

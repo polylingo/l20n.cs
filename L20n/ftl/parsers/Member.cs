@@ -13,7 +13,7 @@ namespace L20n
 			/// <summary>
 			/// The combinator parser used to parse a member.
 			/// 
-			/// __ '*'? '[' member-key ']' __ pattern NL
+			/// __ '*'? '[' member-key ']' __ pattern
 			/// </summary>
 			public static class Member
 			{
@@ -45,11 +45,23 @@ namespace L20n
 
 				public static bool Peek(CharStream cs)
 				{
-					cs.StartBuffering();
-					WhiteSpace.Parse(cs);
-					cs.StopBuffering();
-					char next = cs.PeekNextUnbuffered();
-					return next == '*' || next == '[';
+					char next = cs.PeekNext();
+
+					// if it's a [, we need to make sure we're not dealing with a section
+					if(next == '[') {
+						int bufferPos = cs.Position;
+						cs.SkipNext();
+						next = cs.PeekNext();
+						cs.Rewind(bufferPos);
+						return next != '[';
+					}
+
+					// if it's a *, we know for sure it's a section,
+					// as no other element starts with it
+					if(next == '*')
+						return true;
+
+					return false;
 				}
 			}
 		}

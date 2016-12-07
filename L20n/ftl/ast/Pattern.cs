@@ -50,8 +50,9 @@ namespace L20n
 					if(m_Quoted)
 						writer.Write('"');
 
-					for(int i = 0; i < m_Children.Count; ++i)
+					for(int i = 0; i < m_Children.Count; ++i) {
 						m_Children[i].Serialize(writer);
+					}
 
 					if(m_Quoted)
 						writer.Write('"');

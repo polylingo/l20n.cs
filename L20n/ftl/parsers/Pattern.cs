@@ -25,6 +25,35 @@ namespace L20n
 					return ParseUnquoted(cs);
 				}
 
+				public static bool PeekAndParse(CharStream cs, out FTL.AST.Pattern pattern)
+				{
+					// A quoted-pattern is the easiest to detect, so we'll try that first
+					if(cs.PeekNext() == '"') {
+						pattern = ParseQuoted(cs);
+						return true;
+					}
+
+					// it might still be an unquoted-pattern, but this is trickier to detect
+					// first let's try to detect a placeable and block-text
+					if(Placeable.Peek(cs) || AnyText.PeekBlockText(cs)) {
+						pattern = ParseUnquoted(cs);
+						return true;
+					}
+
+					// if not any of the above, the only thing left is unquoted-text
+					int bufferPos = cs.Position;
+					WhiteSpace.Parse(cs);
+					char next = cs.PeekNext();
+					cs.Rewind(bufferPos);
+					if(!CharStream.IsEOF(next) && !CharStream.IsNL(next)) {
+						pattern = ParseUnquoted(cs);
+						return true;
+					}
+
+					pattern = null;
+					return false;
+				}
+
 				// '"' (placeable | quoted-text)* '"'
 				public static FTL.AST.Pattern ParseQuoted(CharStream cs)
 				{
@@ -78,8 +107,7 @@ namespace L20n
 
 					// as long as we don't have a newline char,
 					// we'll assume it's an unquoted-child
-					char next = cs.PeekNext();
-					if(next != CharStream.EOF && !CharStream.IsNL(next))
+					if(AnyText.PeekUnquoted(cs))
 						return AnyText.ParseUnquoted(cs);
 
 					// return null if no child could be found

@@ -12,6 +12,8 @@ namespace L20n
 		{
 			/// <summary>
 			/// The combinator parser used to parse an entity (similar to L10n's entity).
+			/// 
+			/// identifier __ '=' __ (pattern | pattern member-list | member-list)
 			/// </summary>
 			public static class Message
 			{
@@ -31,19 +33,13 @@ namespace L20n
 					cs.SkipCharacter('=');
 					WhiteSpace.Parse(cs);
 
-
 					FTL.AST.Pattern pattern = null;
 					// check if we have a Pattern available
-					if(!CharStream.IsNL(cs.PeekNext())) {
-						pattern = Pattern.Parse(cs);
-					}
+					bool hasPattern = Pattern.PeekAndParse(cs, out pattern);
 
-					WhiteSpace.Parse(cs);
-
-					NewLine.Parse(cs);
 					FTL.AST.MemberList memberList;
 					bool parsedMemberList = MemberList.PeekAndParse(cs, out memberList);
-					if(!parsedMemberList && pattern == null) {
+					if(!parsedMemberList && !hasPattern) {
 						cs.CreateException(
 							"member-list was epcted, as no pattern was found", null);
 					}

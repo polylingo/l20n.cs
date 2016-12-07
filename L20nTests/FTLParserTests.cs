@@ -20,7 +20,7 @@ namespace L20nTests
 	/// </summary>
 	public class FTLParserTests
 	{
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void WhiteSpaceTests()
 		{
 			var stream = NCS("   \t\t  ");
@@ -40,7 +40,7 @@ namespace L20nTests
 			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
 		}
 		
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void NewLineTests()
 		{
 			var stream = NCS("\n\r\n\n\n");
@@ -60,7 +60,7 @@ namespace L20nTests
 			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void CommentTests()
 		{
 			CharStream stream;
@@ -101,7 +101,7 @@ namespace L20nTests
 			Assert.AreEqual("\n", stream.ReadUntilEnd());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void KeywordTests()
 		{
 			// a normal (and best case example)
@@ -123,7 +123,7 @@ namespace L20nTests
 			Throws(() => Keyword.Parse(NCS(" cannot start with space")));
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void SectionFullASTTests()
 		{
 			L20n.FTL.AST.INode node;
@@ -138,7 +138,7 @@ namespace L20nTests
 			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets ]"), ctx, out node));
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void IdentifierTests()
 		{
 			// a normal (and best case example)
@@ -163,7 +163,7 @@ namespace L20nTests
 			Throws(() => Identifier.Parse(NCS(" cannot start with space")));
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void BuiltinTests()
 		{
 			// a normal (and best case example)
@@ -199,7 +199,7 @@ namespace L20nTests
 			Assert.AreEqual(expected, writer.ToString());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void NumberTests()
 		{
 			// legal examples
@@ -217,7 +217,7 @@ namespace L20nTests
 			Throws(() => Number.Parse(NCS("hello"))); // only numbers allowed
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void VariableTests()
 		{
 			// As long as it's an identifier prefixed with '$' it's fine
@@ -233,7 +233,7 @@ namespace L20nTests
 			// kind of identifier is legal and what not
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void MemberExpressionTests()
 		{
 			Assert.IsTrue(MemberExpression.Peek(NCS("[")));
@@ -251,7 +251,7 @@ namespace L20nTests
 			Throws(() => MemberExpression.Parse(NCS("[42]"), id)); // illegal keyword
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void AttributeTests()
 		{
 			// good examples
@@ -275,7 +275,7 @@ namespace L20nTests
 			Assert.AreEqual(typeof(T), argument.GetType());
 		}
 		
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void ArgumentTests()
 		{
 			// just some examples,
@@ -323,7 +323,7 @@ namespace L20nTests
 			Assert.AreEqual(typeof(L20n.FTL.AST.Pattern), argument.GetType());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void ParseUnquotedPattern()
 		{
 			// block-text
@@ -363,7 +363,7 @@ namespace L20nTests
 				| how are you today, on { DAY($date) } { MONTH($date) }?");
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void CallExpressionTests()
 		{
 			var builtin = Builtin.Parse(NCS("FOO"));
@@ -390,7 +390,7 @@ namespace L20nTests
 			Assert.AreEqual(typeof(T), expression.GetType());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void ExpressionTests()
 		{
 			// just some examples,
@@ -435,7 +435,7 @@ namespace L20nTests
 			Assert.AreEqual(typeof(L20n.FTL.AST.Placeable), result.GetType());
 		}
 		
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void PlaceableTests()
 		{
 			// Expression
@@ -461,7 +461,7 @@ namespace L20nTests
 			// for more examples check the different types of expressions
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void UnquotedTextTests()	
 		{
 			Assert.IsNotNull(AnyText.ParseUnquoted(NCS("this is fine")));
@@ -473,7 +473,7 @@ namespace L20nTests
 			Assert.AreEqual("{it will stop", cs.ReadUntilEnd());
 		}
 		
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void QuotedTextTests()	
 		{
 			Assert.IsNotNull(AnyText.ParseQuoted(NCS("this is fine")));
@@ -522,7 +522,7 @@ namespace L20nTests
 			Assert.AreEqual(typeof(T), memberKey.GetType());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void MemberKeyTests()
 		{
 			// the three possible MemberKeys
@@ -545,7 +545,7 @@ namespace L20nTests
 			Assert.AreEqual(typeof(L20n.FTL.AST.Member), member.GetType());
 		}
 
-		[Test()]
+		[Test(), Timeout(2000)]
 		public void MemberTests()
 		{
 			checkValidMember("[keyword] something");
@@ -554,15 +554,54 @@ namespace L20nTests
 			checkValidMember("[ui/desc] Hello, { $username }!");
 			checkValidMember("[other] You have now { $count } items!");
 		}
-
-		[Test()]
-		public void MessageTests()
+		
+		private void checkValidMessage(string input, string rest = "")
 		{
-			// TODO
+			var cs = NCS(input);
+			var ctx = new Context(Context.ASTTypes.Full);
+			L20n.FTL.AST.INode node;
+			Assert.IsTrue(Message.PeekAndParse(cs, ctx, out node));
+			Assert.IsNotNull(node);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(L20n.FTL.AST.Entity), node.GetType());
 		}
 
-		// BodyParser: TODO:
-		// Make sure that FTL files that end with no empty new line work as well
+		[Test(), Timeout(2000)]
+		public void MessageTests()
+		{
+			checkValidMessage("hello = Hello, World!");
+			checkValidMessage("hello = Hello, { $user }!");
+			checkValidMessage("hello = \"Hello, { $user }!\"");
+			checkValidMessage(@"brandName = Firefox
+ 									[gender] masculine");
+			checkValidMessage(@"opened-new-window = { brandName[gender] ->
+								 *[masculine] { brandName } otworzyl nowe okno.
+								  [feminine] { brandName } otworzyla nowe okno.
+								}");
+
+			L20n.FTL.AST.INode node;
+			var ctx = new Context(Context.ASTTypes.Full);
+			Assert.IsFalse(Message.PeekAndParse(NCS("   error = space before message is not allowed"), ctx, out node));
+			Assert.IsFalse(Message.PeekAndParse(NCS("\nerror = newline before message is not allowed"), ctx, out node));
+		}
+
+		[Test(), Timeout(2000)]
+		public void ValidFTLFullBodyTest()
+		{
+			var streamReader = StreamReaderFactory.Create("../../resources/parser/example.ftl");
+			var ctx = new Context(Context.ASTTypes.Full);
+			var parser = new Parser();
+			Assert.IsNotNull(parser.Parse(streamReader, ctx));
+		}
+		
+		[Test(), Timeout(2000)]
+		public void ValidFTLPartialBodyTest()
+		{
+			var streamReader = StreamReaderFactory.Create("../../resources/parser/example.ftl");
+			var ctx = new Context(Context.ASTTypes.Partial);
+			var parser = new Parser();
+			Assert.IsNotNull(parser.Parse(streamReader, ctx));
+		}
 
 		public static CharStream NCS(string buffer)
 		{

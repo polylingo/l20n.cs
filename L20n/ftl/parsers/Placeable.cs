@@ -13,12 +13,15 @@ namespace L20n
 			/// <summary>
 			/// The combinator parser used to parse a placeable.
 			/// A placeable contains one or more (select-)expressions.
+			/// 
+			/// '{' __ placeable-list __ '}';
+			/// placeable-list ::= placeable-expression (__ ',' __ NL? __ placeable-list)?;
 			/// </summary>
 			public static class Placeable
 			{
 				public static bool PeekAndParse(CharStream cs, out FTL.AST.INode result)
 				{
-					if(cs.PeekNext() != PREFIX) {
+					if(!Peek(cs)) {
 						result = null;
 						return false;
 					}
@@ -30,6 +33,11 @@ namespace L20n
 					// parse all placeable-expressions
 					do {
 						WhiteSpace.Parse(cs);
+						// optional newline
+						if(CharStream.IsNL(cs.PeekNext())) {
+							NewLine.Parse(cs);
+							WhiteSpace.Parse(cs);
+						}
 						placeable.AddExpression(PlaceableExpression.Parse(cs));
 						WhiteSpace.Parse(cs);
 						if(cs.PeekNext() != ',') {
@@ -40,12 +48,23 @@ namespace L20n
 						cs.SkipNext();
 					} while(true);
 
-					// skip optional space and postfix
+					// skip optional space
 					WhiteSpace.Parse(cs);
+					// optional newline
+					if(CharStream.IsNL(cs.PeekNext())) {
+						NewLine.Parse(cs);
+						WhiteSpace.Parse(cs);
+					}
+
 					cs.SkipCharacter(POSTFIX);
 
 					result = placeable;
 					return true;
+				}
+
+				public static bool Peek(CharStream cs)
+				{
+					return cs.PeekNext() == PREFIX;
 				}
 				
 				private const char PREFIX = '{';

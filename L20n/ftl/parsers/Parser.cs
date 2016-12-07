@@ -1,6 +1,7 @@
 // Glen De Cauwsemaecker licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 using System;
+using System.IO;
 
 using L20n.IO;
 
@@ -20,8 +21,10 @@ namespace L20n
 				/// <summary>
 				/// Parses an entire charstream into an FTL AST
 				/// </summary>
-				public FTL.AST.Body Parse(CharStream cs, Context ctx)
+				public FTL.AST.Body Parse(StreamReader reader, Context ctx)
 				{
+					CharStream cs = new CharStream(reader);
+
 					FTL.AST.Body root = new FTL.AST.Body(ctx);
 					L20n.FTL.AST.INode entry;
 					
@@ -36,7 +39,9 @@ namespace L20n
 					}
 
 					if(!cs.EndOfStream())
-						throw cs.CreateException("didn't reach end of stream while that was expected", null);
+						throw cs.CreateException(
+							"didn't reach end of stream while that was expected: `" + cs.ReadUntilEnd() + "`",
+							null);
 
 					return root;
 				}

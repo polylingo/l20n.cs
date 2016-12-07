@@ -14,7 +14,7 @@ namespace L20n
 			/// The combinator parser used to parse a (select-)expression.
 			/// 
 			/// expression | select-expression
-			/// select-expression ::= expression __ ' ->' __ member-list
+			/// select-expression ::= expression __ ' ->' __ member-list NL?
 			/// </summary>
 			public static class PlaceableExpression
 			{
@@ -22,17 +22,15 @@ namespace L20n
 				{	
 					FTL.AST.INode expression = Expresson.Parse(cs);
 
-					cs.StartBuffering();
+					int bufferPos = cs.Position;
 					WhiteSpace.Parse(cs);
-					cs.StopBuffering();
-					
-					if(cs.PeekNextUnbuffered() != SEPERATOR[0]) {
+
+					if(cs.PeekNext() != SEPERATOR[0]) {
 						// it's not a select expression, so let's return early
+						cs.Rewind(bufferPos);
 						return expression;
 					}
 
-					cs.FlushBuffer();
-					
 					// it must be a select expression
 					
 					cs.SkipString(SEPERATOR);
@@ -41,6 +39,10 @@ namespace L20n
 
 					// we expect now a memberList (REQUIRED)
 					FTL.AST.MemberList memberList = MemberList.Parse(cs);
+
+					// skip extra new-line in case one is available
+					if(CharStream.IsNL(cs.PeekNext()))
+						NewLine.Parse(cs);
 
 					// return it all
 					return new FTL.AST.SelectExpression(expression, memberList);
