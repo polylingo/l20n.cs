@@ -12,24 +12,30 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse an expression.
-			/// An expression can be a quoted-pattern, number, identifier,
-			/// variable, call-expression and member-expression.
+			/// 
+			/// identifier | member-expression | call-expression | variable | number | quoted-pattern
 			/// </summary>
 			public static class Expresson
 			{
 				public static FTL.AST.INode Parse(CharStream stream)
 				{
 					FTL.AST.INode result;
-						
 					if(Identifier.PeekAndParse(stream, out result))
 						return ParseWithIdentifier(stream, result as FTL.AST.StringPrimitive);
 						
+					return ParseNoneIdentifier(stream);
+				}
+
+				public static FTL.AST.INode ParseNoneIdentifier(CharStream stream)
+				{
+					FTL.AST.INode result;
+
 					if(Variable.PeekAndParse(stream, out result))
 						return result;
-						
+					
 					if(Number.PeekAndParse(stream, out result))
 						return result;
-
+					
 					return Pattern.ParseQuoted(stream);
 				}
 

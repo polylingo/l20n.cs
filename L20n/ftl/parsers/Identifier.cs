@@ -12,6 +12,8 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse an identifier.
+			/// 
+			/// [a-zA-Z_.?-] ([a-zA-Z0-9_.?-])*
 			/// </summary>
 			public static class Identifier
 			{
@@ -43,12 +45,15 @@ namespace L20n
 				{
 					return (c >= 'a' && c <= 'z') ||
 						(c >= 'A' && c <= 'Z') ||
-							c == '_' || c == '.' || c == '?' || c == '-';
+						c == '_' || c == '.' || c == '?' || c == '-';
 				}
 				
 				private static bool PostfixPredicate(char c)
 				{
-					return IsValidPrefix(c) || (c >= '0' && c <= '9');
+					return (c >= 'a' && c <= 'z') ||
+						(c >= 'A' && c <= 'Z') ||
+						c == '_' || c == '.' || c == '?' || c == '-' ||
+						(c >= '0' && c <= '9');
 				}
 			}
 		}

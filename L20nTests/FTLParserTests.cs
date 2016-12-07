@@ -26,19 +26,17 @@ namespace L20nTests
 			var stream = NCS("   \t\t  ");
 			
 			// This will read everything
-			WhiteSpace.Skip(stream);
+			WhiteSpace.Parse(stream);
 			// This will not read anything, but it's optional
 			// so it will not give an exception
-			Assert.IsFalse(WhiteSpace.PeekAndSkip(stream));
-			// when trying to skip it will however give an exception
-			Throws(() => WhiteSpace.Skip(stream));
+			WhiteSpace.Parse(stream);
 			
 			
 			stream = NCS("   a <- foo");
 			
 			// This will read until 'a'
-			WhiteSpace.Skip(stream);
-			Assert.IsFalse(WhiteSpace.PeekAndSkip(stream));
+			WhiteSpace.Parse(stream);
+			WhiteSpace.Parse(stream);
 			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
 		}
 		
@@ -48,19 +46,17 @@ namespace L20nTests
 			var stream = NCS("\n\r\n\n\n");
 			
 			// This will read everything
-			NewLine.Skip(stream);
+			NewLine.Parse(stream);
 			// This will fail as it's not optional
-			Throws(() => NewLine.Skip(stream));
-			// When it's optional it will simply return false
-			Assert.IsFalse(NewLine.PeekAndSkip(stream));
+			Throws(() => NewLine.Parse(stream));
 			
 			
 			stream = NCS("\n\r\n\n\ra <- foo");
 			
 			// This will read until 'a'
-			Assert.IsTrue(NewLine.PeekAndSkip(stream));
+			NewLine.Parse(stream);
 			// This will fail as it's not optional
-			Throws(() => NewLine.Skip(stream));
+			Throws(() => NewLine.Parse(stream));
 			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
 		}
 
@@ -75,7 +71,7 @@ namespace L20nTests
 			L20n.FTL.AST.INode node;
 				
 			// This will read everything
-			stream = NCS("# a comment in expected form\n");
+			stream = NCS("# a comment in expected form");
 			Assert.IsTrue(Comment.PeekAndParse(stream, fctx, out node));
 			Assert.IsNotNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
@@ -83,14 +79,14 @@ namespace L20nTests
 			stream = NCS("# a comment in expected form\n");
 			Assert.IsTrue(Comment.PeekAndParse(stream, pctx, out node));
 			Assert.IsNull(node);
-			Assert.IsEmpty(stream.ReadUntilEnd());
+			Assert.AreEqual("\n", stream.ReadUntilEnd());
 				
 			// this will fail
-			Assert.IsFalse(Comment.PeekAndParse(NCS("as it is not a comment\n"), pctx, out node));
+			Assert.IsFalse(Comment.PeekAndParse(NCS("as it is not a comment"), pctx, out node));
 			Assert.IsNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
 			// this will also fail
-			Assert.IsFalse(Comment.PeekAndParse(NCS("as # it is still not a comment\n"), pctx, out node));
+			Assert.IsFalse(Comment.PeekAndParse(NCS("as # it is still not a comment"), pctx, out node));
 			Assert.IsNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
 				
@@ -99,7 +95,10 @@ namespace L20nTests
 			stream = NCS("# a comment in expected form\n# new comment\n");
 			Assert.IsTrue(Comment.PeekAndParse(stream, fctx, out node));
 			Assert.IsNotNull(node);
-			Assert.AreEqual("# new comment\n", stream.ReadUntilEnd());
+			stream.SkipNext(); // skip newline
+			Assert.IsTrue(Comment.PeekAndParse(stream, fctx, out node));
+			Assert.IsNotNull(node);
+			Assert.AreEqual("\n", stream.ReadUntilEnd());
 		}
 
 		[Test()]
@@ -134,10 +133,9 @@ namespace L20nTests
 			// a section starts with '[['
 			Assert.IsFalse(Section.PeekAndParse(NCS("not a section"), ctx, out node));
 			Throws(() => Section.PeekAndParse(NCS("[not a section either]"), ctx, out node));
-			Assert.IsTrue(Section.PeekAndParse(NCS("[[ a section ]]\n"),ctx,  out node));
+			Assert.IsTrue(Section.PeekAndParse(NCS("[[ a section ]]"),ctx,  out node));
 			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets"), ctx, out node));
 			Throws(() => Section.PeekAndParse(NCS("[[ needs to end with double brackets ]"), ctx, out node));
-			Throws(() => Section.PeekAndParse(NCS("[[ needs to have newline char at the end ]]"), ctx, out node));
 		}
 
 		[Test()]
@@ -170,10 +168,14 @@ namespace L20nTests
 		{
 			// a normal (and best case example)
 			Assert.IsNotNull(Builtin.Parse(NCS("NUMBER")));
+			Assert.IsTrue(Builtin.IsValid("NUMBER"));
 			
 			// other legal (but not always great) examples
 			Assert.IsNotNull(Builtin.Parse(NCS("SOME_BUILT-IN")));
 			Assert.IsNotNull(Builtin.Parse(NCS("?-._A-Z")));
+
+			Assert.IsTrue(Builtin.IsValid("SOME_BUILT-IN"));
+			Assert.IsTrue(Builtin.IsValid("?-._A-Z"));
 			
 			// bad examples
 			Throws(() => Builtin.Parse(NCS(""))); // cannot be empty
@@ -312,6 +314,55 @@ namespace L20nTests
 			Throws(() => Argument.Parse(NCS("")));
 		}
 
+		private void CheckValidUnquotedPattern(string input, string rest = "")
+		{
+			var cs = NCS(input);
+			var argument = Pattern.ParseUnquoted(cs);
+			Assert.IsNotNull(argument);
+			Assert.AreEqual(rest, cs.ReadUntilEnd());
+			Assert.AreEqual(typeof(L20n.FTL.AST.Pattern), argument.GetType());
+		}
+
+		[Test()]
+		public void ParseUnquotedPattern()
+		{
+			// block-text
+			CheckValidUnquotedPattern(@"
+				| this blocktext
+				| is fine");
+
+			// Placeable: Expression
+			CheckValidUnquotedPattern("{ Foo }");
+			CheckValidUnquotedPattern("{ foo[bar] }");
+			CheckValidUnquotedPattern("{ $variable }");
+			CheckValidUnquotedPattern("{ \"value\" }");
+			CheckValidUnquotedPattern("{ 42 }");
+			
+			// Placeable: Expressions
+			CheckValidUnquotedPattern("{ Foo, foo[bar], $variable, \"value\", 42 }");
+			
+			// Placeable: SelectExpression
+			CheckValidUnquotedPattern(@"{ $count ->
+				[0] There are no items :(
+				[1] There is one item :|
+				*[other] { $variable ->
+					[a] something related to a
+					[b] something related to b
+				}
+			}");
+
+			// unquoted-text
+			CheckValidUnquotedPattern("hello my dear child");
+
+			// combination of unquoted-text and placeable
+			CheckValidUnquotedPattern("Hello, { $name }!");
+
+			// combination of block-text and placeable
+			CheckValidUnquotedPattern(@"
+				| Hello, { $name },
+				| how are you today, on { DAY($date) } { MONTH($date) }?");
+		}
+
 		[Test()]
 		public void CallExpressionTests()
 		{
@@ -442,28 +493,24 @@ namespace L20nTests
 		[Test()]
 		public void BlockTextTests()	
 		{
-			// TODO : Fix this buggy parsing
-			// Also... we have a potential problem with block text,
-			// as a block text consists out of `| <unquoted-pattern>`
-			// and an unquoted-pattern can be a block, it means that
-			// a block-text of 3 lines, is 3 unquoted-patterns deep, rather than simply returning early
-			// this shouldn't really happen I think, as it is asking for trouble...
-			// need to find a way to fix this, without breaking l20n spec intentions.
-			/*
 			L20n.FTL.AST.INode result;
 			// good examples
 			Assert.IsTrue(AnyText.PeekAndParseBlock(NCS(@"
 				| this blocktext
 				| is fine"), out result));
-			Assert.IsTrue(AnyText.PeekAndParseBlock(NCS(@"
-| this blocktext is also fine"), out result));
+			var cs = NCS(@"
+| this blocktext is also fine
+	hello");
+			Assert.IsTrue(AnyText.PeekAndParseBlock(cs, out result));
+			Assert.AreEqual(@"
+	hello", cs.ReadUntilEnd());
 
 			// bad examples
 			// newline required
 			Assert.IsFalse(AnyText.PeekAndParseBlock(NCS(""), out result));
 			// | required
 			Assert.IsFalse(AnyText.PeekAndParseBlock(NCS(@"
-"), out result));*/
+"), out result));
 		}
 
 		private void checkValidMemberkey<T>(string input, string rest = "")

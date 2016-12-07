@@ -16,10 +16,10 @@ namespace L20n
 			/// </summary>
 			public static class AnyText
 			{
+				// ([^{] | '\{')+
 				public static FTL.AST.StringPrimitive ParseUnquoted(CharStream cs)
 				{
 					s_Buffer.Clear();
-					WhiteSpace.PeekAndSkip(cs);
 
 					bool allowCB = false;
 					char next = cs.PeekNext();
@@ -39,10 +39,11 @@ namespace L20n
 					return new FTL.AST.StringPrimitive(new string(s_Buffer.ToArray()));
 				}
 
+				// ([^{"] | '\{' | '\"')+
 				public static FTL.AST.QuotedText ParseQuoted(CharStream cs)
 				{
 					s_Buffer.Clear();
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					
 					bool allowSC = false;
 					char next = cs.PeekNext();
@@ -62,25 +63,65 @@ namespace L20n
 					return new FTL.AST.QuotedText(new string(s_Buffer.ToArray()));
 				}
 
+				// NL __ '|' __ (unquoted-text | placeable)+
 				public static bool PeekAndParseBlock(CharStream cs, out FTL.AST.INode result)
 				{
-					WhiteSpace.PeekAndSkip(cs);
-					if(!CharStream.IsNL(cs.PeekNext())) {
+					char next = cs.PeekNext();
+					// if next char isn't a NewLine Character, we know for sure we
+					// are not dealing with a block-text
+					if(next == CharStream.EOF || !CharStream.IsNL(next)) {
 						result = null;
 						return false;
 					}
 
+					// from here on out, we're still not sure if we're dealing with a block-text
+					// thus we start buffering so we can go back in time
+					// here we check if we have the following pattern: `NL __ '|'`
+					cs.StartBuffering();
+					NewLine.Parse(cs);
+					WhiteSpace.Parse(cs);
+					cs.StopBuffering();
+					// if the next unbuffered char is not '|' we're not dealing with a block-text
+					// and can return;
+					if(cs.PeekNextUnbuffered() != '|') {
+						result = null;
+						return false;
+					}
+
+					// we know for sure we're dealing with a block-text,
+					// buffer can be flushed and we can start checking for more lines as well;
+					cs.FlushBuffer();
+					FTL.AST.INode line;
+
 					FTL.AST.BlockText blockText = new FTL.AST.BlockText();
-					NewLine.Skip(cs);
-					WhiteSpace.PeekAndSkip(cs);
 					do {
-						cs.SkipCharacter('|');
-						WhiteSpace.PeekAndSkip(cs);
-						blockText.AddLine(Pattern.ParseUnquoted(cs));
-						WhiteSpace.PeekAndSkip(cs);
-						NewLine.Skip(cs);
-						WhiteSpace.PeekAndSkip(cs);
-					} while(cs.PeekNext() == '|');
+						cs.FlushBuffer();
+						cs.SkipNext(); // skip '|'
+
+						WhiteSpace.Parse(cs);
+
+						if(!Placeable.PeekAndParse(cs, out line)) {
+							// it's not a placeable, so it must be unquoted-text
+							line = ParseUnquoted(cs);
+						}
+
+						// add line
+						blockText.AddLine(line);
+
+						// peek if next char is a newline char
+						// otherwise we can stop early with trying
+						next = cs.PeekNext();
+						if(next == CharStream.EOF || !CharStream.IsNL(next))
+							break;
+
+						// check if we have more lines
+						cs.StartBuffering();
+						NewLine.Parse(cs);
+						WhiteSpace.Parse(cs);
+						cs.StopBuffering();
+						// as long as the next unbuffered char is '|'
+						// we'll keep looping
+					} while(cs.PeekNextUnbuffered() == '|');
 
 					result = blockText;
 					return true;

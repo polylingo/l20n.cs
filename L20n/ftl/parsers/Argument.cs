@@ -14,6 +14,9 @@ namespace L20n
 			/// <summary>
 			/// The combinator parser used to parse an Argument.
 			/// An argument can be either an expression or a keyword-argument.
+			/// 
+			/// argument ::= expression | keyword-argument
+			/// keyword-argument ::= identifier __ '=' __ quoted-pattern
 			/// </summary>
 			public static class Argument
 			{
@@ -24,17 +27,22 @@ namespace L20n
 					// if it's an identifier, it could be either simply be an identifier,
 					// or it could actually be a keyword-argument
 					if(Identifier.PeekAndParse(cs, out result)) {
+						// make sure we buffer, so that we can put it back in case we realize
+						// it is not a keyword-argument after all
+						cs.StartBuffering();
 						// ignore any whitespace
-						WhiteSpace.PeekAndSkip(cs);
+						WhiteSpace.Parse(cs);
+						cs.StopBuffering();
 							
 						// if we now encounter a `=` char, we'll assume it's a keyword-argument,
 						// and finish the parsing of that element,
 						// otherwise we'll assume it's simply an identifier and return early
-						if(cs.PeekNext() != '=')
+						if(cs.PeekNextUnbuffered() != '=')
 							return Expresson.ParseWithIdentifier(cs, result as FTL.AST.StringPrimitive);
 
+						cs.FlushBuffer(); // flush the whitespace
 						cs.SkipNext();
-						WhiteSpace.PeekAndSkip(cs);
+						WhiteSpace.Parse(cs);
 							
 						FTL.AST.Pattern pattern = Pattern.ParseQuoted(cs);
 						return new FTL.AST.KeywordArgument(
@@ -43,7 +51,7 @@ namespace L20n
 					}
 						
 					// it's not an identifier, so is must be any non-identifier expression
-					return Expresson.Parse(cs);
+					return Expresson.ParseNoneIdentifier(cs);
 				}
 			}
 		}

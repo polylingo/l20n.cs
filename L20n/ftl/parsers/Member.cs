@@ -12,12 +12,15 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a member.
-			/// A member consists out of a member-key and a pattern.
+			/// 
+			/// __ '*'? '[' member-key ']' __ pattern NL
 			/// </summary>
 			public static class Member
 			{
 				public static FTL.AST.Member Parse(CharStream cs)
 				{
+					WhiteSpace.Parse(cs);
+
 					bool isDefault = false;
 
 					if(cs.PeekNext() == '*') {
@@ -31,7 +34,7 @@ namespace L20n
 					cs.SkipCharacter(']');
 					
 					// skip optional space
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					
 					// Parse the actual pattern
 					FTL.AST.Pattern pattern = Pattern.Parse(cs);
@@ -42,19 +45,11 @@ namespace L20n
 
 				public static bool Peek(CharStream cs)
 				{
-					char next = cs.PeekNext();
+					cs.StartBuffering();
+					WhiteSpace.Parse(cs);
+					cs.StopBuffering();
+					char next = cs.PeekNextUnbuffered();
 					return next == '*' || next == '[';
-				}
-
-				public static bool PeekAndParse(CharStream cs, out FTL.AST.Member member)
-				{
-					if(Peek(cs)) {
-						member = Parse(cs);
-						return true;
-					}
-
-					member = null;
-					return false;
 				}
 			}
 		}

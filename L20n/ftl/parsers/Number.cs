@@ -12,6 +12,8 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a number.
+			/// 
+			/// [0-9]+ ('.' [0-9]+)?
 			/// </summary>
 			public static class Number
 			{
@@ -28,7 +30,7 @@ namespace L20n
 						string fraction = cs.ReadWhile(IsValidDigit);
 						if(fraction.Length == 0) {
 							throw cs.CreateException(
-								"no <number> digits received, while at least one was expected", null);
+								"no <number> decimal digits received, while at least one was expected", null);
 						}
 
 						rawValue += fraction;

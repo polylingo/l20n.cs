@@ -12,6 +12,8 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a member-expression.
+			/// 
+			/// identifier '[' keyword ']'
 			/// </summary>
 			public static class MemberExpression
 			{

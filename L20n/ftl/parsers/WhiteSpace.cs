@@ -13,19 +13,14 @@ namespace L20n
 			/// <summary>
 			/// The parser combinator used to parse all the whitespace.
 			/// The resulting output does not get stored.
+			/// 
+			/// [ \t]*
 			/// </summary>
 			public static class WhiteSpace
 			{
-				public static void Skip(CharStream cs)
+				public static void Parse(CharStream cs)
 				{
-					if(cs.SkipWhile(IsWhiteSpace) <= 0)
-						throw cs.CreateException(
-							"at least one WhiteSpace character is required", null);
-				}
-				
-				public static bool PeekAndSkip(CharStream cs)
-				{
-					return cs.SkipWhile(IsWhiteSpace) > 0;
+					cs.SkipWhile(IsWhiteSpace);
 				}
 
 				private static bool IsWhiteSpace(char c)

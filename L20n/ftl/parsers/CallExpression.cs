@@ -12,6 +12,9 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a call-expression.
+			/// 
+			/// builtin '(' __ arglist? __ ')'
+			/// arglist ::= argument (__ ',' __ arglist)?
 			/// </summary>
 			public static class CallExpression
 			{
@@ -28,9 +31,9 @@ namespace L20n
 					FTL.AST.ArgumentsList arguments = new FTL.AST.ArgumentsList();
 					
 					while(cs.PeekNext() != POSTFIX) {
-						WhiteSpace.PeekAndSkip(cs);
+						WhiteSpace.Parse(cs);
 						arguments.AddArgument(Argument.Parse(cs));
-						WhiteSpace.PeekAndSkip(cs);
+						WhiteSpace.Parse(cs);
 						if(cs.PeekNext() != ',')
 							break; // exit early, as no more arguments are expected
 						cs.SkipNext(); // skip ','

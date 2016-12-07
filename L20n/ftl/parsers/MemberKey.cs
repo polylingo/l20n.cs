@@ -12,6 +12,8 @@ namespace L20n
 		{
 			/// <summary>
 			/// The combinator parser used to parse a member-key.
+			/// 
+			///  ((identifier '/')? keyword) | number
 			/// </summary>
 			public static class Memberkey
 			{

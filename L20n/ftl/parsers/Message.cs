@@ -27,9 +27,9 @@ namespace L20n
 
 				private static FTL.AST.Entity Parse(CharStream cs, Context ctx, FTL.AST.StringPrimitive identifier)
 				{
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					cs.SkipCharacter('=');
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 
 
 					FTL.AST.Pattern pattern = null;
@@ -38,9 +38,9 @@ namespace L20n
 						pattern = Pattern.Parse(cs);
 					}
 
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 
-					NewLine.Skip(cs);
+					NewLine.Parse(cs);
 					FTL.AST.MemberList memberList;
 					bool parsedMemberList = MemberList.PeekAndParse(cs, out memberList);
 					if(!parsedMemberList && pattern == null) {

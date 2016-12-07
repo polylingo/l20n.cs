@@ -12,28 +12,32 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a (select-)expression.
+			/// 
+			/// expression | select-expression
+			/// select-expression ::= expression __ ' ->' __ member-list
 			/// </summary>
 			public static class PlaceableExpression
 			{
 				public static FTL.AST.INode Parse(CharStream cs)
 				{	
 					FTL.AST.INode expression = Expresson.Parse(cs);
-					bool wsSkipped = WhiteSpace.PeekAndSkip(cs);
+
+					cs.StartBuffering();
+					WhiteSpace.Parse(cs);
+					cs.StopBuffering();
 					
-					if(cs.PeekNext() != SEPERATOR[0]) {
+					if(cs.PeekNextUnbuffered() != SEPERATOR[0]) {
 						// it's not a select expression, so let's return early
 						return expression;
 					}
+
+					cs.FlushBuffer();
 					
 					// it must be a select expression
 					
-					// make sure we have at least 1 space
-					if(!wsSkipped) {
-						throw cs.CreateException(String.Format(
-							"require at least 1 space before '{0}' in a select-expression", SEPERATOR), null);
-					}
-					
 					cs.SkipString(SEPERATOR);
+
+					WhiteSpace.Parse(cs);
 
 					// we expect now a memberList (REQUIRED)
 					FTL.AST.MemberList memberList = MemberList.Parse(cs);

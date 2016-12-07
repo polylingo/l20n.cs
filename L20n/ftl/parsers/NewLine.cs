@@ -14,19 +14,21 @@ namespace L20n
 			/// <summary>
 			/// The parser combinator used to parse all the newlines.
 			/// The resulting output does not get stored.
+			/// 
+			/// [\r\n]+
 			/// </summary>
 			public static class NewLine
 			{
-				public static void Skip(CharStream cs)
+				public static void Parse(CharStream cs)
 				{
-					if(cs.SkipWhile(CharStream.IsNL) <= 0)
+					if(cs.SkipWhile(IsNewLine) <= 0)
 						throw cs.CreateException(
 							"at least one newline character is required", null);
 				}
-
-				public static bool PeekAndSkip(CharStream cs)
+				
+				private static bool IsNewLine(char c)
 				{
-					return cs.SkipWhile(CharStream.IsNL) > 0;
+					return c == '\r' || c == '\n';
 				}
 			}
 		}

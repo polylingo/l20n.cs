@@ -13,6 +13,8 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a keyword.
+			/// 
+			/// [a-zA-Z_.?-] ([a-zA-Z0-9_.?- ]* [a-zA-Z0-9_.?-])?
 			/// </summary>
 			public static class Keyword
 			{
@@ -45,7 +47,10 @@ namespace L20n
 
 				private static bool PostfixPredicate(char c)
 				{
-					return IsValidPrefix(c) || (c >= '0' && c <= '9') || c == ' ';
+					return (c >= 'a' && c <= 'z') ||
+						(c >= 'A' && c <= 'Z') ||
+						c == '_' || c == '.' || c == '?' || c == '-' ||
+						(c >= '0' && c <= '9') || c == ' ';
 				}
 			}
 		}

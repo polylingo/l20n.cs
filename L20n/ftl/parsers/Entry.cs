@@ -12,21 +12,20 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse an entry.
-			/// An entry could be a comment or a section, but should usually be a message.
+			/// 
+			/// message | comment | sectioN
 			/// </summary>
 			public static class Entry
 			{
 				public static bool PeekAndParse(CharStream cs, Context ctx, out L20n.FTL.AST.INode result)
 				{
-					WhiteSpace.PeekAndSkip(cs);
-
 					if (Message.PeekAndParse(cs, ctx, out result))
 						return true;
 					
-					if (Section.PeekAndParse(cs, ctx, out result))
+					if (Comment.PeekAndParse(cs, ctx, out result))
 						return true;
 					
-					if (Comment.PeekAndParse(cs, ctx, out result))
+					if (Section.PeekAndParse(cs, ctx, out result))
 						return true;
 					
 					result = null;

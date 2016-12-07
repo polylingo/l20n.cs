@@ -29,9 +29,9 @@ namespace L20n
 					FTL.AST.Placeable placeable = new FTL.AST.Placeable();
 					// parse all placeable-expressions
 					do {
-						WhiteSpace.PeekAndSkip(cs);
+						WhiteSpace.Parse(cs);
 						placeable.AddExpression(PlaceableExpression.Parse(cs));
-						WhiteSpace.PeekAndSkip(cs);
+						WhiteSpace.Parse(cs);
 						if(cs.PeekNext() != ',') {
 							break;
 						}
@@ -41,7 +41,7 @@ namespace L20n
 					} while(true);
 
 					// skip optional space and postfix
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					cs.SkipCharacter(POSTFIX);
 
 					result = placeable;

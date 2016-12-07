@@ -12,6 +12,8 @@ namespace L20n
 		{
 			/// <summary>
 			/// The default FTL Parser
+			/// 
+			/// body ::= (entry NL)* (entry)? EOF;
 			/// </summary>
 			public sealed class Parser : IParser
 			{	
@@ -26,7 +28,15 @@ namespace L20n
 					while(Entry.PeekAndParse(cs, ctx, out entry)) {
 						if(entry != null) // could have been ommitted because of partial AST
 							root.AddEntry(entry);
+
+						if(!CharStream.IsNL(cs.PeekNext()))
+							break;
+
+						NewLine.Parse(cs);
 					}
+
+					if(!cs.EndOfStream())
+						throw cs.CreateException("didn't reach end of stream while that was expected", null);
 
 					return root;
 				}

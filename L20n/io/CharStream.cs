@@ -96,6 +96,21 @@ namespace L20n
 			}
 			
 			/// <summary>
+			/// Peeks the next unbuffered Character.
+			/// </summary>
+			public char PeekNextUnbuffered()
+			{
+				try {
+					int i = m_Stream.Peek();
+					if(i == -1)
+						return EOF;
+					return (char)i;
+				} catch(Exception e) {
+					throw CreateException("next character could not be peeked", e);
+				}
+			}
+			
+			/// <summary>
 			/// Reads the next Character.
 			/// </summary>
 			/// <remarks>
@@ -104,29 +119,31 @@ namespace L20n
 			public char ReadNext()
 			{
 				try {
-					++m_Position;
-					if(!m_IsBuffering && m_StreamBuffer.Count > 0)
-						return m_StreamBuffer.Dequeue();
+					char next;
 
-					int i = m_Stream.Read();
-					if(i == -1) {
-						throw CreateException("EOF reached, while this was not expected", null);
-					}
-
-					char next = (char)i;
-					if(next == '\r') {
-						if(PeekNext() == '\n') {
-							next = (char)m_Stream.Read(); // we count '\r\n' as 1 char
+					if(!m_IsBuffering && m_StreamBuffer.Count > 0) { // read from streamBuffer
+						next = m_StreamBuffer.Dequeue();
+					} else { // read from stream
+						int i = m_Stream.Read();
+						if(i == -1) {
+							throw CreateException("EOF reached, while this was not expected", null);
 						}
+
+						next = (char)i;
+
+						// check if we have a carriage return,
+						// if so we might be dealing with a newline WindowsTM combinaton
+						// we only have to check this when reading from the actual stream,
+						// as we're storing the combination as '\n' in the buffer.
+						if(next == '\r' && PeekNext() == '\n')
+							next = (char) m_Stream.Read();
 					}
 
-					if(IsNL(next)) {
-						m_NewLineCount++;
-						m_NewLineStartPosition = m_Position;
-					}
-
+					// in case we're buffering, add the char to the stream
 					if(m_IsBuffering)
 						m_StreamBuffer.Enqueue(next);
+
+					MovePosition(next);
 
 					return next;
 				} catch(Exception e) {
@@ -192,28 +209,9 @@ namespace L20n
 			{
 				try {
 					string s = new string(m_StreamBuffer.ToArray()) + m_Stream.ReadToEnd();
-					FlushBuffer();
-					if(s != null) {
-						m_Position += s.Length;
-
-						for(int i = 0; i < s.Length; ++i) {
-							if(s[i] == '\n') {
-								++m_NewLineCount;
-								m_NewLineStartPosition = m_Position;
-								continue;
-							}
-
-							if(s[i] == '\r') {
-								if(i < s.Length - 1 && s[i + 1] == '\n') {
-									++i;
-								}
-								
-								++m_NewLineCount;
-								m_NewLineStartPosition = m_Position;
-							}
-						}
-					}
-					
+					m_StreamBuffer.Clear();
+					if(s != null)
+						MovePosition(s.ToCharArray());
 					return s;
 				} catch(Exception e) {
 					throw CreateException("could not read until end", e);
@@ -287,10 +285,51 @@ namespace L20n
 			}
 
 			/// <summary>
+			/// Moves the position and relevant information based
+			/// on the currently read character.
+			/// </summary>
+			private void MovePosition(char c)
+			{
+				++m_Position;
+
+				if(IsNL(c)) {
+					m_NewLineCount++;
+					m_NewLineStartPosition = m_Position;
+				}
+			}
+
+			/// <summary>
+			/// Moves the position and relevant information based
+			/// on the currently read characters.
+			/// </summary>
+			private void MovePosition(char[] s)
+			{
+				m_Position += s.Length;
+				
+				for(int i = 0; i < s.Length; ++i) {
+					if(s[i] == '\n') {
+						++m_NewLineCount;
+						m_NewLineStartPosition = m_Position;
+						continue;
+					}
+					
+					if(s[i] == '\r') {
+						if(i < s.Length - 1 && s[i + 1] == '\n') {
+							++i;
+						}
+						
+						++m_NewLineCount;
+						m_NewLineStartPosition = m_Position;
+					}
+				}
+			}
+
+			/// <summary>
 			/// Flushes whatever was left in the StreamBuffer.
 			/// </summary>
 			public void FlushBuffer()
 			{
+				MovePosition(m_StreamBuffer.ToArray());
 				m_StreamBuffer.Clear();
 			}
 
@@ -300,7 +339,17 @@ namespace L20n
 			/// </summary>
 			public void StartBuffering()
 			{
+				if(m_IsBuffering)
+					throw new Exception("buffering already started");
+
+				if(m_StreamBuffer.Count > 0)
+					MovePosition(m_StreamBuffer.ToArray());
+				
 				m_IsBuffering = true;
+				m_BufferPosition = m_Position;
+				m_BufferNewLineCount = m_NewLineCount;
+				m_BufferNewLineStartPosition = m_NewLineStartPosition;
+
 			}
 
 			/// <summary>
@@ -311,7 +360,13 @@ namespace L20n
 			/// </summary>
 			public void StopBuffering()
 			{
+				if(!m_IsBuffering)
+					throw new Exception("buffering already stopped");
+
 				m_IsBuffering = false;
+				m_Position = m_BufferPosition;
+				m_NewLineCount = m_BufferNewLineCount;
+				m_NewLineStartPosition = m_BufferNewLineStartPosition;
 			}
 						
 			/// <summary>
@@ -373,6 +428,9 @@ namespace L20n
 
 			// used for when we might need to go back in time at some point
 			private bool m_IsBuffering;
+			private int m_BufferPosition;
+			private int m_BufferNewLineStartPosition;
+			private int m_BufferNewLineCount;
 			private Queue<char> m_StreamBuffer;
 		}
 	}

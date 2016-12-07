@@ -170,29 +170,41 @@ namespace L20nTests
 		public void StreamBufferTests()
 		{
 			var cs = NCS("abcde\r\nfghijk\nlmnopq");
+			Assert.AreEqual("L1:1", cs.ComputeDetailedPosition());
 			cs.StartBuffering();
 			Assert.AreEqual("abcde", cs.ReadLine());
+			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
 			cs.StopBuffering();
+			Assert.AreEqual("L1:1", cs.ComputeDetailedPosition());
 			// the old buffered content is still there (didn't flush)
 			Assert.AreEqual("abcde", cs.ReadLine());
+			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
 			cs.StartBuffering();
 			Assert.AreEqual("fghijk", cs.ReadLine());
+			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
 			cs.StopBuffering();
+			Assert.AreEqual("L2:1", cs.ComputeDetailedPosition());
 			Assert.AreEqual('f', cs.PeekNext());
 			Assert.AreEqual('f', cs.PeekNext());
+			Assert.AreEqual('l', cs.PeekNextUnbuffered());
 			cs.FlushBuffer();
+			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
 			Assert.AreEqual('l', cs.PeekNext());
 			// this time we have flushed,
 			// as one would do in case a certain condition is fine
 			// so we actually read new content
 			cs.StartBuffering();
+			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
 			Assert.AreEqual("lmnopq", cs.ReadLine());
+			Assert.AreEqual("L3:7", cs.ComputeDetailedPosition());
 			// stream is finished, and we're still buffering
 			Assert.IsTrue(cs.EndOfStream());
 			cs.StopBuffering();
+			Assert.AreEqual("L3:1", cs.ComputeDetailedPosition());
 			// stopped buffering, stream is ended but buffer has still content
 			Assert.IsFalse(cs.EndOfStream());
 			cs.FlushBuffer();
+			Assert.AreEqual("L3:7", cs.ComputeDetailedPosition());
 			// not buffering, stream is ended and buffer is empty
 			Assert.IsTrue(cs.EndOfStream());
 		}

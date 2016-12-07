@@ -12,12 +12,14 @@ namespace L20n
 		{
 			/// <summary>
 			/// The combinator parser used to parse a comment.
+			/// 
+			/// '#' .*
 			/// </summary>
 			public static class Comment
 			{
 				public static bool PeekAndParse(CharStream cs, Context ctx, out FTL.AST.INode comment)
 				{
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					if (cs.PeekNext() != '#')
 					{
 						comment = null;
@@ -37,23 +39,21 @@ namespace L20n
 				
 				private static FTL.AST.Comment Parse(CharStream cs)
 				{
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					cs.SkipCharacter('#');
-					string value = cs.ReadWhile(IsNotNL);
-					NewLine.Skip(cs);
+					string value = cs.ReadWhile(Predicate);
 					return new L20n.FTL.AST.Comment(value);
 				}
 				
 				private static void Skip(CharStream cs)
 				{
 					cs.SkipCharacter('#');
-					cs.SkipWhile(IsNotNL);
-					NewLine.Skip(cs);
+					cs.SkipWhile(Predicate);
 				}
 
-				private static bool IsNotNL(char c)
+				private static bool Predicate(char c)
 				{
-					return !CharStream.IsNL(c);
+					return c != CharStream.EOF && c != '\n' && c != '\r';
 				}
 			}
 		}

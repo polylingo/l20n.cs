@@ -12,6 +12,8 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a section.
+			/// 
+			/// '[[' __ keyword __ ']]'
 			/// </summary>
 			public static class Section
 			{
@@ -35,28 +37,20 @@ namespace L20n
 
 				private static FTL.AST.Section Parse(CharStream cs)
 				{
-					WhiteSpace.PeekAndSkip(cs);
 					cs.SkipString(PREFIX);
-					WhiteSpace.PeekAndSkip(cs);
-					
+					WhiteSpace.Parse(cs);
 					var keyword = Keyword.Parse(cs);
-					
-					WhiteSpace.PeekAndSkip(cs);
+					WhiteSpace.Parse(cs);
 					cs.SkipString(POSTFIX);
-					WhiteSpace.PeekAndSkip(cs);
-					NewLine.Skip(cs);
 					
 					return new FTL.AST.Section(keyword);
 				}
 				
 				private static void Skip(CharStream cs)
 				{
-					WhiteSpace.PeekAndSkip(cs);
-					cs.SkipString(PREFIX);
 					// this does mean that for applications the section could be bullox, but that's fine
 					// tooling should prevent such things
 					cs.SkipWhile(IsNotNewLine);
-					NewLine.Skip(cs);
 				}
 
 				private const string PREFIX = "[[";
@@ -64,7 +58,7 @@ namespace L20n
 					
 				private static bool IsNotNewLine(char c)
 				{
-					return CharStream.IsNL(c);
+					return !CharStream.IsNL(c);
 				}
 			}
 		}

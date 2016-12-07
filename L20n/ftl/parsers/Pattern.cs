@@ -12,7 +12,8 @@ namespace L20n
 		{	
 			/// <summary>
 			/// The combinator parser used to parse a pattern.
-			/// A pattern can be quoted or unquoted.
+			/// 
+			/// quoted-pattern | unquoted-pattern
 			/// </summary>
 			public static class Pattern
 			{
@@ -24,6 +25,7 @@ namespace L20n
 					return ParseUnquoted(cs);
 				}
 
+				// '"' (placeable | quoted-text)* '"'
 				public static FTL.AST.Pattern ParseQuoted(CharStream cs)
 				{
 					cs.SkipCharacter('"');
@@ -46,6 +48,7 @@ namespace L20n
 					return pattern;
 				}
 
+				// (unquoted-text | placeable | block-text)+
 				public static FTL.AST.Pattern ParseUnquoted(CharStream cs)
 				{
 					FTL.AST.Pattern pattern = new FTL.AST.Pattern(false);
@@ -70,9 +73,8 @@ namespace L20n
 					if(Placeable.PeekAndParse(cs, out child))
 						return child;
 
-					// [TODO] Fix Block
-					//if(AnyText.PeekAndParseBlock(cs, out child))
-					//	return child;
+					if(AnyText.PeekAndParseBlock(cs, out child))
+						return child;
 
 					// as long as we don't have a newline char,
 					// we'll assume it's an unquoted-child

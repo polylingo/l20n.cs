@@ -13,14 +13,16 @@ namespace L20n
 			/// <summary>
 			/// The combinator parser used to parse a variable.
 			/// A variable contains an identifier.
+			/// 
+			/// '$' identifier
 			/// </summary>
 			public static class Variable
 			{
-				public static L20n.FTL.AST.Variable Parse(CharStream cs)
+				public static FTL.AST.Variable Parse(CharStream cs)
 				{
 					cs.SkipCharacter(PREFIX);
-					L20n.FTL.AST.StringPrimitive identifier = Identifier.Parse(cs);
-					return new L20n.FTL.AST.Variable(identifier);
+					FTL.AST.StringPrimitive identifier = Identifier.Parse(cs);
+					return new FTL.AST.Variable(identifier);
 				}
 					
 				public static bool PeekAndParse(CharStream stream, out L20n.FTL.AST.INode result)
