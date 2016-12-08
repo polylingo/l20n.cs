@@ -73,7 +73,10 @@ namespace L20n
 				string output = "";
 				if(m_Pos != m_BufferSize)
 					output += new string(m_CharBuffer, m_Pos, m_BufferSize - m_Pos);
-				FlushBuffer();
+
+				m_Pos = 0;
+				m_BufferSize = 0;
+
 				if(!m_StreamReader.EndOfStream)
 					output += m_StreamReader.ReadToEnd();
 				return output;
@@ -102,19 +105,6 @@ namespace L20n
 					throw new Exception(String.Format("{0} is an invalid bufffer position"));
 
 				m_Pos = pos;
-			}
-
-			/// <summary>
-			/// Flushes the character buffer, resetting its info
-			/// and resizing the buffer to its original size if needed.
-			/// </summary>
-			public void FlushBuffer()
-			{
-				m_Pos = 0;
-				m_BufferSize = 0;
-				if(m_BufferLimit > NORMAL_BUFFER_LIMIT)
-					Array.Resize<char>(ref m_CharBuffer, NORMAL_BUFFER_LIMIT);
-				m_BufferLimit = NORMAL_BUFFER_LIMIT;
 			}
 
 			/// <summary>

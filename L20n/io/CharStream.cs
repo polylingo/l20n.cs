@@ -215,14 +215,6 @@ namespace L20n
 			{
 				m_Stream.RewindBuffer(pos);
 			}
-
-			/// <summary>
-			/// Flushes whatever was left in the StreamBuffer.
-			/// </summary>
-			public void FlushStreamBuffer()
-			{
-				m_Stream.FlushBuffer();
-			}
 						
 			/// <summary>
 			/// Returns <c>true</c> if the stream has no more characters left,

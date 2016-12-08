@@ -53,16 +53,15 @@ namespace L20nTests
 			Assert.AreEqual(3, pos);
 
 			Assert.AreEqual('c', cs.PeekNext());
-			cs.FlushBuffer();
 			pos = cs.GetBufferPosition();
-			Assert.AreEqual(0, pos);
+			Assert.AreEqual(3, pos);
 			Assert.AreEqual('c', cs.PeekNext());
 			cs.RewindBuffer(pos);
 			Assert.AreEqual('c', cs.PeekNext());
 			Assert.AreEqual('c', cs.PeekNext());
 
 			pos = cs.GetBufferPosition();
-			Assert.AreEqual(0, pos);
+			Assert.AreEqual(3, pos);
 
 			for(int i = 0; i < 5; ++i) {
 				Assert.AreEqual('c', cs.ReadNext());
@@ -72,14 +71,14 @@ namespace L20nTests
 				Assert.AreEqual('f', cs.ReadNext());
 
 				pos = cs.GetBufferPosition();
-				Assert.AreEqual(5, pos);
+				Assert.AreEqual(8, pos);
 				
 				Assert.AreEqual(0, cs.PeekNext());
 
-				cs.RewindBuffer(0);
+				cs.RewindBuffer(3);
 				
 				pos = cs.GetBufferPosition();
-				Assert.AreEqual(0, pos);
+				Assert.AreEqual(3, pos);
 			}
 			
 			Assert.AreEqual('c', cs.PeekNext());
