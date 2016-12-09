@@ -19,7 +19,6 @@ namespace L20n
 			{
 				public static bool PeekAndParse(CharStream cs, Context ctx, out FTL.AST.INode comment)
 				{
-					WhiteSpace.Parse(cs);
 					if (cs.PeekNext() != '#')
 					{
 						comment = null;
@@ -39,7 +38,6 @@ namespace L20n
 				
 				private static FTL.AST.Comment Parse(CharStream cs)
 				{
-					WhiteSpace.Parse(cs);
 					cs.SkipCharacter('#');
 					string value = cs.ReadWhile(Predicate);
 					return new L20n.FTL.AST.Comment(value);

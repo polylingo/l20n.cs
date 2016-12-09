@@ -571,6 +571,7 @@ namespace L20nTests
 		{
 			checkValidMessage("hello = Hello, World!");
 			checkValidMessage("hello = Hello, { $user }!");
+			checkValidMessage("hello = Hello, {$user}!");
 			checkValidMessage("hello = \"Hello, { $user }!\"");
 			checkValidMessage(@"brandName = Firefox
  									[gender] masculine");
@@ -578,11 +579,147 @@ namespace L20nTests
 								 *[masculine] { brandName } otworzyl nowe okno.
 								  [feminine] { brandName } otworzyla nowe okno.
 								}");
+			checkValidMessage(@"opened-new-window = { brandName[gender] ->
+*[masculine] { brandName } otworzyl nowe okno.
+[feminine] { brandName } otworzyla nowe okno. }");
 
 			L20n.FTL.AST.INode node;
 			var ctx = new Context(Context.ASTTypes.Full);
 			Assert.IsFalse(Message.PeekAndParse(NCS("   error = space before message is not allowed"), ctx, out node));
 			Assert.IsFalse(Message.PeekAndParse(NCS("\nerror = newline before message is not allowed"), ctx, out node));
+		}
+
+		[Test(), Timeout(2000)]
+		public void EntryTests()
+		{
+			L20n.FTL.AST.INode node;
+			var ctx = new Context(Context.ASTTypes.Full);
+
+			Assert.IsTrue(Entry.PeekAndParse(NCS("# a comment"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("#a_comment"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("[[aSection]]"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("[[ aSection]]"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("[[aSection ]]"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("a = message"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("a= message"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("a =message"), ctx, out node));
+			Assert.IsTrue(Entry.PeekAndParse(NCS("a=message"), ctx, out node));
+
+			Assert.IsFalse(Entry.PeekAndParse(NCS(""), ctx, out node));
+			Assert.IsFalse(Entry.PeekAndParse(NCS("\n"), ctx, out node));
+			Assert.IsFalse(Entry.PeekAndParse(NCS("42"), ctx, out node));
+		}
+
+		private void checkValidBody(string input)
+		{
+			var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(input));
+			var streamReader = new StreamReader(memoryStream);
+			
+			var parser = new Parser();
+			var body = parser.Parse(streamReader, new Context(Context.ASTTypes.Full));
+			Assert.IsNotNull(body);
+			Assert.IsTrue(streamReader.EndOfStream);
+		}
+
+		[Test(), Timeout(2000)]
+		public void ValidBodyTests()
+		{
+			// simple body examples
+			checkValidBody(""); // empty
+			checkValidBody("# a comment"); // a comment
+			checkValidBody("[[ a section ]]"); // a section
+
+			// examples os messages
+			checkValidBody("a = message");
+			checkValidBody("foo = bar\n  [foo] bar\n");
+			checkValidBody("foo = bar\n  [foo] bar\n# a comment");
+			checkValidBody("foo = bar\n  [foo] bar\na = message");
+			checkValidBody("foo = bar\n  [foo] bar\n[[ a section ]]");
+
+			// examples of messages containing expressions
+			checkValidBody("hello=hello{$user}!");
+			checkValidBody("hello=hello{user}!");
+			checkValidBody("hello = Hello { $user }!");
+			// l20n.org/learn example
+			checkValidBody(@"l20n = L20n
+intro = { build ->
+    [dev]       You're using a dev build of { l20n }.
+    [prod]      You're using a production-ready single-file version of { l20n }.
+    *[unknown]  You're using an unknown version of { l20n }.
+}");
+			// same example but trying to use as little whitespace as possible
+			checkValidBody(@"l20n=L20n
+#           V-- here a space is needed as `-` is a legal reference character
+intro={build ->
+[dev]You're using a dev build of {l20n}.
+[prod]You're using a production-ready single-file version of {l20n}.
+*[unknown]You're using an unknown version of {l20n}.}");
+			// rediculous but legal example
+			checkValidBody(@"hello =
+								| Hello,
+							| {
+									$user
+						}
+					| !");
+			// another syntax-wise valid example, but semantically it makes no sense
+			checkValidBody("foo = hello { bar } { $baz } { \"foo\" ->       \n" +
+				"[a] = 1\n\t\t\t[2] = b\n *[a] ok\n*[b]42\n[c] = whatever\n" +
+				"\t\t\t\t} more stuff {$user?}!\n[a] b\n\t\t\t *[b] c");
+			// rediculously deep select-expression
+			checkValidBody(@"hello = { $a ->
+								[a]
+									| a
+									| line
+								*[b] another possibility { $count }
+								*[c]
+									| another
+									| one
+								[d] or { $this ->
+											[o] ne
+											[b]
+												| a
+												| b { $c ->
+														[d] ok
+													}
+												| c
+										}
+								[a] double-definition
+								[c] another { $double ->
+													[1] a
+													[a] 2
+											}
+							}");
+		}
+
+		private void checkInvalidBody(string input)
+		{
+			var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(input));
+			var streamReader = new StreamReader(memoryStream);
+			
+			var parser = new Parser();
+			Throws(() => parser.Parse(streamReader, new Context(Context.ASTTypes.Full)));
+		}
+
+		[Test(), Timeout(2000)]
+		public void InvalidBodyTests()
+		{
+			// spaces before an entry aren't allowed
+			checkInvalidBody(" # a comment");
+			checkInvalidBody(" a = message");
+			checkInvalidBody(" [[ a section ]]");
+
+			// spaces before an entry, which comes after a member-list, should still not be allowed
+			checkInvalidBody("foo = bar\n  [foo] bar\n # a comment");
+			checkInvalidBody("foo = bar\n  [foo] bar\n a = message");
+			checkInvalidBody("foo = bar\n  [foo] bar\n [[ a section ]]");
+
+			// entries need to be seperated by a newline character
+			checkInvalidBody("[[ section ]] foo = bar");
+			checkInvalidBody("[[ section ]] # comment");
+			checkInvalidBody("[[ section ]] [[ another section ]]");
+
+			// space required between reference and `->` in select expression
+			checkInvalidBody("foo = { $count-> \n[0] There are no items :(\n}");
 		}
 
 		[Test(), Timeout(2000)]
