@@ -76,8 +76,11 @@ namespace L20n
 			{
 				if(m_BufferBlock.Length < n)
 					m_BufferBlock = new char[n];
-				for(int i = 0; i < n; i++)
+				for(int i = 0; i < n; i++) {
+					if(EndOfStream())
+						break;
 					m_BufferBlock[i] = ReadNext();
+				}
 				return new string(m_BufferBlock, 0, n);
 			}
 			
@@ -164,7 +167,7 @@ namespace L20n
 						nextout = "EOF";
 
 					string msg = string.Format(@"next character was `{0}`, while `{1}` was expected", nextout, expected);
-					throw CreateException(msg , null);
+					throw CreateException(msg, null);
 				}
 				SkipNext();
 			}
@@ -231,8 +234,15 @@ namespace L20n
 			/// </summary>
 			public ParseException CreateException(string msg, Exception e)
 			{
+				int bufferPos = Position;
+				string context = ReadBlock(20);
+				if(!EndOfStream())
+					context += "...";
+				Rewind(bufferPos);
+
 				return new ParseException(
-					String.Format("Parse Exception: {0}", ToLiteral(msg)), e);
+					String.Format("Parse Exception near {0}: {1}",
+				              ToLiteral(context.Replace("\0", "")), ToLiteral(msg)), e);
 			}
 						
 			/// <summary>
@@ -245,10 +255,8 @@ namespace L20n
 
 			private static string ToLiteral(string input)
 			{
-				using (var writer = new StringWriter())
-				{
-					using (var provider = CodeDomProvider.CreateProvider("CSharp"))
-					{
+				using(var writer = new StringWriter()) {
+					using(var provider = CodeDomProvider.CreateProvider("CSharp")) {
 						provider.GenerateCodeFromExpression(new CodePrimitiveExpression(input), writer, null);
 						return writer.ToString();
 					}

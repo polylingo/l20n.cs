@@ -40,8 +40,8 @@ namespace L20n
 					FTL.AST.MemberList memberList;
 					bool parsedMemberList = MemberList.PeekAndParse(cs, out memberList);
 					if(!parsedMemberList && !hasPattern) {
-						cs.CreateException(
-							"member-list was epcted, as no pattern was found", null);
+						throw cs.CreateException(
+							"member-list was expected, as no pattern was found", null);
 					}
 
 					return new FTL.AST.Entity(identifier, pattern, memberList);

@@ -40,7 +40,7 @@ namespace L20n
 
 					if(!cs.EndOfStream())
 						throw cs.CreateException(
-							"didn't reach end of stream while that was expected: `" + cs.ReadUntilEnd() + "`",
+							"didn't reach end of stream (EOF) while that was expected: `" + cs.ReadUntilEnd() + "`",
 							null);
 
 					return root;

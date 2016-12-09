@@ -22,7 +22,7 @@ namespace L20n
 					string value = cs.ReadWhile(Predicate);
 					if(value.Length == 0) {
 						throw cs.CreateException(
-							"no characters received, while at least one was expected", null);
+							"no builtin found, while one was expected", null);
 					}
 
 					return new L20n.FTL.AST.StringPrimitive(value);
