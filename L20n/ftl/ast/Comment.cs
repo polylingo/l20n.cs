@@ -20,13 +20,12 @@ namespace L20n
 				/// <summary>
 				/// Initializes a new instance of the <see cref="L20n.FTL.AST.Comment"/> class.
 				/// </summary>
-				/// <param name="value">Value.</param>
 				public Comment(string value)
 				{
 					m_Values = new List<string>(1);
 					m_Values.Add(value);
 				}
-				
+
 				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
@@ -44,7 +43,7 @@ namespace L20n
 					for(int i = 0; i < otherComment.m_Values.Count; ++i)
 						m_Values.Add(otherComment.m_Values[i]);
 				}
-				
+
 				private List<string> m_Values; // one value per line
 			}
 		}

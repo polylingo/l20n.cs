@@ -19,7 +19,6 @@ namespace L20n
 			/// <summary>
 			/// Initializes a new instance of the <see cref="L20n.IO.BufferedStreamReader"/> class.
 			/// </summary>
-			/// <param name="reader">Reader.</param>
 			public BufferedStreamReader(StreamReader reader)
 			{
 				m_StreamReader = reader;
@@ -55,7 +54,7 @@ namespace L20n
 					m_BufferLimit *= 2;
 					Array.Resize<char>(ref m_CharBuffer, m_BufferLimit);
 				}
-				
+
 				// buffer the read character
 				m_CharBuffer[m_Pos++] = output;
 				m_BufferSize = m_Pos;
@@ -142,4 +141,3 @@ namespace L20n
 		}
 	}
 }
-
