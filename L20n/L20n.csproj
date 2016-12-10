@@ -87,6 +87,7 @@
     <Compile Include="io\Writer.cs" />
     <Compile Include="exceptions\SerializeException.cs" />
     <Compile Include="io\BufferedStreamReader.cs" />
+    <Compile Include="ftl\ast\Reference.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

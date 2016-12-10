@@ -283,8 +283,8 @@ namespace L20nTests
 			// check the tests for that case
 			
 			// Identifier
-			checkValidArgument<L20n.FTL.AST.StringPrimitive>("Foo");
-			checkValidExpression<L20n.FTL.AST.StringPrimitive>("boo909");
+			checkValidArgument<L20n.FTL.AST.Reference>("Foo");
+			checkValidExpression<L20n.FTL.AST.Reference>("boo909");
 			
 			// MemberExpression
 			checkValidArgument<L20n.FTL.AST.MemberExpression>("foo[bar]");
@@ -398,8 +398,8 @@ namespace L20nTests
 			// check the tests for that case
 
 			// Identifier
-			checkValidExpression<L20n.FTL.AST.StringPrimitive>("Foo");
-			checkValidExpression<L20n.FTL.AST.StringPrimitive>("boo909");
+			checkValidExpression<L20n.FTL.AST.Reference>("Foo");
+			checkValidExpression<L20n.FTL.AST.Reference>("boo909");
 
 			// MemberExpression
 			checkValidExpression<L20n.FTL.AST.MemberExpression>("foo[bar]");

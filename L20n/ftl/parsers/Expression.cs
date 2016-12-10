@@ -48,7 +48,7 @@ namespace L20n
 					if(CallExpression.Peek(stream))
 						return CallExpression.Parse(stream, identifier);
 					
-					return identifier;
+					return new FTL.AST.Reference(identifier);
 				}
 			}
 		}
