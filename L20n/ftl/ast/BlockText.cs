@@ -26,14 +26,6 @@ namespace L20n
 				}
 				
 				/// <summary>
-				/// A comment is metadata, and thus optimization does not apply to it.
-				/// </summary>
-				public INode Optimize()
-				{
-					return this;
-				}
-				
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
 				public void Serialize(Writer writer)

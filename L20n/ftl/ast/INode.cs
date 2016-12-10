@@ -15,11 +15,6 @@ namespace L20n
 			public interface INode
 			{
 				/// <summary>
-				/// Returns the most optimized form of itself.
-				/// </summary>
-				INode Optimize();
-
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
 				void Serialize(Writer writer);

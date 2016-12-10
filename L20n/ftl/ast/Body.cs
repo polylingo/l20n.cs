@@ -33,16 +33,6 @@ namespace L20n
 				}
 
 				/// <summary>
-				/// Return itself with its entries in their most optimized form.
-				/// </summary>
-				public INode Optimize()
-				{
-					for(int i = 0; i < m_Entries.Count; ++i)
-						m_Entries[i] = m_Entries[i].Optimize();
-					return this;
-				}
-
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// In other words, this writes the entire FTL document.
 				/// </summary>

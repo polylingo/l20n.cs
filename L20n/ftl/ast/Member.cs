@@ -28,14 +28,6 @@ namespace L20n
 				}
 				
 				/// <summary>
-				/// Returns the most optimized form of itself.
-				/// </summary>
-				public INode Optimize()
-				{
-					throw new NotImplementedException();
-				}
-				
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
 				public void Serialize(Writer writer)

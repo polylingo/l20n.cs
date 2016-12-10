@@ -33,14 +33,6 @@ namespace L20n
 				}
 				
 				/// <summary>
-				/// TODO
-				/// </summary>
-				public INode Optimize()
-				{
-					throw new NotImplementedException();
-				}
-				
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
 				public void Serialize(Writer writer)

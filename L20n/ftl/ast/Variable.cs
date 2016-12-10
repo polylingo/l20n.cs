@@ -24,14 +24,6 @@ namespace L20n
 				}
 				
 				/// <summary>
-				/// Returns itself, as it can't be optimized any further.
-				/// </summary>
-				public INode Optimize()
-				{
-					return this;
-				}
-				
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
 				public void Serialize(Writer writer)

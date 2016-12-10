@@ -33,16 +33,6 @@ namespace L20n
 				}
 				
 				/// <summary>
-				/// Returns itself, with all its arguments in its most optimized form.
-				/// </summary>
-				public INode Optimize()
-				{
-					for(int i = 0; i < m_Arguments.Count; ++i)
-						m_Arguments[i] = m_Arguments[i].Optimize();
-					return this;
-				}
-				
-				/// <summary>
 				/// Writes its content and the content of its children.
 				/// </summary>
 				public void Serialize(Writer writer)

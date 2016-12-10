@@ -32,14 +32,6 @@ namespace L20n
 					Console.WriteLine(value);
 					m_Value = value;
 				}
-
-				/// <summary>
-				/// Returns itself, as it can't be optimized any further.
-				/// </summary>
-				public INode Optimize()
-				{
-					return this;
-				}
 				
 				/// <summary>
 				/// Writes its content and the content of its children.
