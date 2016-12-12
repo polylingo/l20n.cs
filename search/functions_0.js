@@ -7,6 +7,6 @@ var searchData=
   ['addline',['AddLine',['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_block_text.html#ad8e3273bd6c8f766a1628acf95443ccf',1,'L20n::FTL::AST::BlockText']]],
   ['addmember',['AddMember',['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_member_list.html#a5f76ef1a9b50f2e8b794857096c45643',1,'L20n::FTL::AST::MemberList']]],
   ['argumentslist',['ArgumentsList',['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_arguments_list.html#ae3ab4828a44bd484f933df339ef1b95d',1,'L20n::FTL::AST::ArgumentsList']]],
-  ['attachcomment',['AttachComment',['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_entity.html#a2ea74ee6515927af4c031c9b43786334',1,'L20n.FTL.AST.Entity.AttachComment()'],['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_section.html#a2ea660af65796db6035e20e19963e649',1,'L20n.FTL.AST.Section.AttachComment()']]],
+  ['attachcomment',['AttachComment',['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_message.html#a7bdd2ae5290e9a409ba5054bcd2a3847',1,'L20n.FTL.AST.Message.AttachComment()'],['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_section.html#a2ea660af65796db6035e20e19963e649',1,'L20n.FTL.AST.Section.AttachComment()']]],
   ['attribute',['Attribute',['../class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_attribute.html#aafb600816e3bbed13dcc326604e72e7b',1,'L20n::FTL::AST::Attribute']]]
 ];

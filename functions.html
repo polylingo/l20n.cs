@@ -29,7 +29,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">L20n.cs
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
+   <div id="projectbrief">Source code and more information can be found at: https://github.com/polylingo/l20n.cs</div>
   </td>
  </tr>
  </tbody>
@@ -110,7 +112,7 @@ $(document).ready(function(){initNavTree('functions.html','');});
 : <a class="el" href="class_l20n_1_1_f_t_l_1_1_parsers_1_1_context.html#a1763f5eb8d7d6ebf7cad667fc4a66011">L20n.FTL.Parsers.Context</a>
 </li>
 <li>AttachComment()
-: <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_entity.html#a2ea74ee6515927af4c031c9b43786334">L20n.FTL.AST.Entity</a>
+: <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_message.html#a7bdd2ae5290e9a409ba5054bcd2a3847">L20n.FTL.AST.Message</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_section.html#a2ea660af65796db6035e20e19963e649">L20n.FTL.AST.Section</a>
 </li>
 <li>Attribute()
@@ -169,9 +171,6 @@ $(document).ready(function(){initNavTree('functions.html','');});
 : <a class="el" href="class_l20n_1_1_i_o_1_1_buffered_stream_reader.html#a1e2b5117f40a4a8cdfdf2015ae064305">L20n.IO.BufferedStreamReader</a>
 , <a class="el" href="class_l20n_1_1_i_o_1_1_char_stream.html#ab729e4573e4c9ecacd1adfc413b20c0b">L20n.IO.CharStream</a>
 </li>
-<li>Entity()
-: <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_entity.html#a77aa41c39ae9b87e9cb22fbf9403caa9">L20n.FTL.AST.Entity</a>
-</li>
 </ul>
 
 
@@ -214,6 +213,9 @@ $(document).ready(function(){initNavTree('functions.html','');});
 </li>
 <li>Merge()
 : <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_comment.html#a2d5aeaf9561fd69c1b35fd147f9c12cb">L20n.FTL.AST.Comment</a>
+</li>
+<li>Message()
+: <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_message.html#ae93f06130c4049da9db086f3ca003163">L20n.FTL.AST.Message</a>
 </li>
 </ul>
 
@@ -307,12 +309,12 @@ $(document).ready(function(){initNavTree('functions.html','');});
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_body.html#a3784bd6171b17626a5244f1ed0d1ffca">L20n.FTL.AST.Body</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_call_expression.html#a110aa0c153efa8bc9f5c840848d62611">L20n.FTL.AST.CallExpression</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_comment.html#a9b72784bd5eac05795325f11a415ca3c">L20n.FTL.AST.Comment</a>
-, <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_entity.html#a5e45515b0f819d26f7f47626187a2b42">L20n.FTL.AST.Entity</a>
 , <a class="el" href="interface_l20n_1_1_f_t_l_1_1_a_s_t_1_1_i_node.html#a00c24ce2865a69f783d6dd762ac431d9">L20n.FTL.AST.INode</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_keyword_argument.html#a860a336f914da2c3365121f9b4715ca0">L20n.FTL.AST.KeywordArgument</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_member.html#ac0bb7d85f3f9977fe209012e8fdadce3">L20n.FTL.AST.Member</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_member_expression.html#a70ccb06071a163b6af3edfcbfbe2ba15">L20n.FTL.AST.MemberExpression</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_member_list.html#aad2383f753e7c361c1bb9a4a4c134556">L20n.FTL.AST.MemberList</a>
+, <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_message.html#a70657d80749e65b3200bd5bd9ad23df2">L20n.FTL.AST.Message</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_number.html#abe212961096e0eda50e1d7922bae4ae6">L20n.FTL.AST.Number</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_pattern.html#a50a931fa42aa90d0772c464ecc7764cf">L20n.FTL.AST.Pattern</a>
 , <a class="el" href="class_l20n_1_1_f_t_l_1_1_a_s_t_1_1_placeable.html#ae28e509de6823eca9bce1e02c9f8dd71">L20n.FTL.AST.Placeable</a>
