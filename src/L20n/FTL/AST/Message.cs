@@ -11,12 +11,15 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// represents the AST element for an entity, AKA /message/
+			/// represents the AST element for a /message/ (AKA entity/term).
 			/// More Information: <see cref="L20n.FTL.Parsers.Message"/>
 			/// </summary>
-			public sealed class Entity : INode
+			public sealed class Message : INode
 			{	
-				public Entity(StringPrimitive identifier, Pattern pattern, MemberList memberList)
+				/// <summary>
+				/// Initializes a new instance of the <see cref="L20n.FTL.AST.Message"/> class.
+				/// </summary>
+				public Message(StringPrimitive identifier, Pattern pattern, MemberList memberList)
 				{
 					m_Identifier = identifier;
 					m_Pattern = pattern;

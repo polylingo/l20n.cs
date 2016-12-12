@@ -563,7 +563,7 @@ namespace L20nTests
 			Assert.IsTrue(Message.PeekAndParse(cs, ctx, out node));
 			Assert.IsNotNull(node);
 			Assert.AreEqual(rest, cs.ReadUntilEnd());
-			Assert.AreEqual(typeof(L20n.FTL.AST.Entity), node.GetType());
+			Assert.AreEqual(typeof(L20n.FTL.AST.Message), node.GetType());
 		}
 
 		[Test(), Timeout(2000)]

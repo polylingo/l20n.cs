@@ -27,7 +27,7 @@ namespace L20n
 					return false;
 				}
 
-				private static FTL.AST.Entity Parse(CharStream cs, Context ctx, FTL.AST.StringPrimitive identifier)
+				private static FTL.AST.Message Parse(CharStream cs, Context ctx, FTL.AST.StringPrimitive identifier)
 				{
 					WhiteSpace.Parse(cs);
 					cs.SkipCharacter('=');
@@ -44,7 +44,7 @@ namespace L20n
 							"member-list was expected, as no pattern was found", null);
 					}
 
-					return new FTL.AST.Entity(identifier, pattern, memberList);
+					return new FTL.AST.Message(identifier, pattern, memberList);
 				}
 			}
 		}

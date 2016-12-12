@@ -90,7 +90,7 @@ namespace L20n
 					}
 
 					// add comment to message
-					Entity message = entry as Entity;
+					Message message = entry as Message;
 					if(message != null) {
 						message.AttachComment(comment);
 						m_Entries.RemoveAt(lastPosition);
