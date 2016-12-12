@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20n", "L20n.csproj", "{CE292B59-9681-4B80-9031-7F6CA120F44D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20n", "src\L20n\L20n.csproj", "{CE292B59-9681-4B80-9031-7F6CA120F44D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20nTests", "..\L20nTests\L20nTests.csproj", "{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20nTests", "tests\L20n.Tests\L20n.Tests.csproj", "{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

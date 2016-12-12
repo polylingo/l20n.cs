@@ -25,7 +25,7 @@ namespace L20nTests
 		[Test()]
 		public void EmptyFile()
 		{
-			var streamReader = StreamReaderFactory.Create("../../resources/io/Empty.txt");
+			var streamReader = StreamReaderFactory.Create("../../Resources/IO/Empty.txt");
 			var cs = new CharStream(streamReader);
 			Assert.IsTrue(cs.EndOfStream());
 		}
@@ -33,7 +33,7 @@ namespace L20nTests
 		[Test()]
 		public void CharStreamFile()
 		{
-			var streamReader = StreamReaderFactory.Create("../../resources/io/CharStream.txt");
+			var streamReader = StreamReaderFactory.Create("../../Resources/IO/CharStream.txt");
 			var cs = new CharStream(streamReader);
 
 			Assert.AreEqual('H', cs.PeekNext());
@@ -105,7 +105,7 @@ namespace L20nTests
 		public void AllKindOfNLChars()
 		{
 			var cs = NCS("\none\rtwo\nthree\r\nfour\r\rsix\nseven\r\neight\n");
-			
+
 			Assert.IsEmpty(cs.ReadLine());
 			Assert.AreEqual("one", cs.ReadLine());
 			Assert.AreEqual("two", cs.ReadLine());

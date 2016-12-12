@@ -24,35 +24,35 @@ namespace L20nTests
 		public void WhiteSpaceTests()
 		{
 			var stream = NCS("   \t\t  ");
-			
+
 			// This will read everything
 			WhiteSpace.Parse(stream);
 			// This will not read anything, but it's optional
 			// so it will not give an exception
 			WhiteSpace.Parse(stream);
-			
-			
+
+
 			stream = NCS("   a <- foo");
-			
+
 			// This will read until 'a'
 			WhiteSpace.Parse(stream);
 			WhiteSpace.Parse(stream);
 			Assert.AreEqual("a <- foo", stream.ReadUntilEnd());
 		}
-		
+
 		[Test(), Timeout(2000)]
 		public void NewLineTests()
 		{
 			var stream = NCS("\n\r\n\n\n");
-			
+
 			// This will read everything
 			NewLine.Parse(stream);
 			// This will fail as it's not optional
 			Throws(() => NewLine.Parse(stream));
-			
-			
+
+
 			stream = NCS("\n\r\n\n\ra <- foo");
-			
+
 			// This will read until 'a'
 			NewLine.Parse(stream);
 			// This will fail as it's not optional
@@ -69,7 +69,7 @@ namespace L20nTests
 			var pctx = new Context(Context.ASTTypes.Partial);
 
 			L20n.FTL.AST.INode node;
-				
+
 			// This will read everything
 			stream = NCS("# a comment in expected form");
 			Assert.IsTrue(Comment.PeekAndParse(stream, fctx, out node));
@@ -80,7 +80,7 @@ namespace L20nTests
 			Assert.IsTrue(Comment.PeekAndParse(stream, pctx, out node));
 			Assert.IsNull(node);
 			Assert.AreEqual("\n", stream.ReadUntilEnd());
-				
+
 			// this will fail
 			Assert.IsFalse(Comment.PeekAndParse(NCS("as it is not a comment"), pctx, out node));
 			Assert.IsNull(node);
@@ -89,7 +89,7 @@ namespace L20nTests
 			Assert.IsFalse(Comment.PeekAndParse(NCS("as # it is still not a comment"), pctx, out node));
 			Assert.IsNull(node);
 			Assert.IsEmpty(stream.ReadUntilEnd());
-				
+
 			// The Comment parser will read the entire stream
 			// once it detirmined it's a legal comment
 			stream = NCS("# a comment in expected form\n# new comment\n");
@@ -106,7 +106,7 @@ namespace L20nTests
 		{
 			// a normal (and best case example)
 			Assert.IsNotNull(Keyword.Parse(NCS("hello")));
-			
+
 			// other legal (but not always great) examples
 			Assert.IsNotNull(Keyword.Parse(NCS("this is valid")));
 			Assert.IsNotNull(Keyword.Parse(NCS("this_is_also_valid")));
@@ -114,7 +114,7 @@ namespace L20nTests
 			Assert.IsNotNull(Keyword.Parse(NCS("Could be a sentence.")));
 			Assert.IsNotNull(Keyword.Parse(NCS("Or a question?")));
 			Assert.IsNotNull(Keyword.Parse(NCS("Room 42")));
-			
+
 			// bad examples
 			Throws(() => Keyword.Parse(NCS(""))); // cannot be empty
 			Throws(() => Keyword.Parse(NCS("4 cannot start with a number")));
@@ -127,9 +127,9 @@ namespace L20nTests
 		public void SectionFullASTTests()
 		{
 			L20n.FTL.AST.INode node;
-			
+
 			var ctx = new L20n.FTL.Parsers.Context(Context.ASTTypes.Full);
-			
+
 			// a section starts with '[['
 			Assert.IsFalse(Section.PeekAndParse(NCS("not a section"), ctx, out node));
 			Throws(() => Section.PeekAndParse(NCS("[not a section either]"), ctx, out node));
@@ -143,7 +143,7 @@ namespace L20nTests
 		{
 			// a normal (and best case example)
 			Assert.IsNotNull(Identifier.Parse(NCS("hello")));
-			
+
 			// other legal (but not always great) examples
 			Assert.IsNotNull(Identifier.Parse(NCS("this is valid")));
 			Assert.IsNotNull(Identifier.Parse(NCS("this_is_also_valid")));
@@ -153,7 +153,7 @@ namespace L20nTests
 			Assert.IsNotNull(Identifier.Parse(NCS("Room 42")));
 			Assert.IsNotNull(Identifier.Parse(NCS("?")));
 			Assert.IsNotNull(Identifier.Parse(NCS(".-?_???")));
-			
+
 			// bad examples
 			Throws(() => Identifier.Parse(NCS(""))); // cannot be empty
 			Throws(() => Identifier.Parse(NCS("4 cannot start with a number")));
@@ -169,14 +169,14 @@ namespace L20nTests
 			// a normal (and best case example)
 			Assert.IsNotNull(Builtin.Parse(NCS("NUMBER")));
 			Assert.IsTrue(Builtin.IsValid("NUMBER"));
-			
+
 			// other legal (but not always great) examples
 			Assert.IsNotNull(Builtin.Parse(NCS("SOME_BUILT-IN")));
 			Assert.IsNotNull(Builtin.Parse(NCS("?-._A-Z")));
 
 			Assert.IsTrue(Builtin.IsValid("SOME_BUILT-IN"));
 			Assert.IsTrue(Builtin.IsValid("?-._A-Z"));
-			
+
 			// bad examples
 			Throws(() => Builtin.Parse(NCS(""))); // cannot be empty
 			Throws(() => Builtin.Parse(NCS("4 cannot start with a number")));
@@ -205,11 +205,11 @@ namespace L20nTests
 			// legal examples
 			checkValidNumber("42", "42");
 			checkValidNumber("123.456", "123.456");
-			
+
 			// bad examples that do not make it throw an exception,
 			// but just stop parsing instead
 			checkValidNumber("42,00", "42", ",00");
-			
+
 			// bad examples
 			Throws(() => Number.Parse(NCS("42."))); // no digits behind the point given
 			Throws(() => Number.Parse(NCS("-42"))); // '-' not allowed
@@ -223,7 +223,7 @@ namespace L20nTests
 			// As long as it's an identifier prefixed with '$' it's fine
 			Assert.IsNotNull(Variable.Parse(NCS("$hello")));
 			Assert.IsNotNull(Variable.Parse(NCS("$Whatever")));
-			
+
 			// otherwise we get an exception
 			Throws(() => Variable.Parse(NCS("nope"))); // no '$' prefix
 
@@ -238,13 +238,13 @@ namespace L20nTests
 		{
 			Assert.IsTrue(MemberExpression.Peek(NCS("[")));
 			Assert.IsFalse(MemberExpression.Peek(NCS("foo")));
-			
+
 			var id = Identifier.Parse(NCS("foo"));
-			
+
 			// MemberExpressionParsing starts from the '['
 			Assert.IsNotNull(MemberExpression.Parse(NCS("[bar]"), id));
 			Assert.IsNotNull(MemberExpression.Parse(NCS("[this_is-ok?42]"), id));
-			
+
 			// otherwise we get an exception
 			Throws(() => MemberExpression.Parse(NCS("nope"), id)); // no '[' prefix
 			Throws(() => MemberExpression.Parse(NCS("[nope"), id)); // no ']' postfix
@@ -274,34 +274,34 @@ namespace L20nTests
 			Assert.AreEqual(rest, cs.ReadUntilEnd());
 			Assert.AreEqual(typeof(T), argument.GetType());
 		}
-		
+
 		[Test(), Timeout(2000)]
 		public void ArgumentTests()
 		{
 			// just some examples,
 			// for more good/bad examples of each case,
 			// check the tests for that case
-			
+
 			// Identifier
 			checkValidArgument<L20n.FTL.AST.Reference>("Foo");
 			checkValidExpression<L20n.FTL.AST.Reference>("boo909");
-			
+
 			// MemberExpression
 			checkValidArgument<L20n.FTL.AST.MemberExpression>("foo[bar]");
 			checkValidArgument<L20n.FTL.AST.MemberExpression>("Foo09?[bar09?]");
-			
+
 			// CallExpression
 			checkValidArgument<L20n.FTL.AST.CallExpression>("FOO()");
 			checkValidArgument<L20n.FTL.AST.CallExpression>("FOO(DROP(2, baz))");
-			
+
 			// Variable
 			checkValidArgument<L20n.FTL.AST.Variable>("$ok");
 			checkValidArgument<L20n.FTL.AST.Variable>("$Variable");
-			
+
 			// QuotedPattern
 			checkValidArgument<L20n.FTL.AST.Pattern>("\"value\"");
 			checkValidArgument<L20n.FTL.AST.Pattern>("\"{ \"{ $variable }\" }\"");
-			
+
 			// Number
 			checkValidArgument<L20n.FTL.AST.Number>("42");
 			checkValidArgument<L20n.FTL.AST.Number>("123.456");
@@ -337,10 +337,10 @@ namespace L20nTests
 			CheckValidUnquotedPattern("{ $variable }");
 			CheckValidUnquotedPattern("{ \"value\" }");
 			CheckValidUnquotedPattern("{ 42 }");
-			
+
 			// Placeable: Expressions
 			CheckValidUnquotedPattern("{ Foo, foo[bar], $variable, \"value\", 42 }");
-			
+
 			// Placeable: SelectExpression
 			CheckValidUnquotedPattern(@"{ $count ->
 				[0] There are no items :(
@@ -404,11 +404,11 @@ namespace L20nTests
 			// MemberExpression
 			checkValidExpression<L20n.FTL.AST.MemberExpression>("foo[bar]");
 			checkValidExpression<L20n.FTL.AST.MemberExpression>("Foo09?[bar09?]");
-			
+
 			// CallExpression
 			checkValidExpression<L20n.FTL.AST.CallExpression>("FOO()");
 			checkValidExpression<L20n.FTL.AST.CallExpression>("FOO(DROP(2, baz))");
-			
+
 			// Variable
 			checkValidExpression<L20n.FTL.AST.Variable>("$ok");
 			checkValidExpression<L20n.FTL.AST.Variable>("$Variable");
@@ -434,7 +434,7 @@ namespace L20nTests
 			Assert.AreEqual(rest, cs.ReadUntilEnd());
 			Assert.AreEqual(typeof(L20n.FTL.AST.Placeable), result.GetType());
 		}
-		
+
 		[Test(), Timeout(2000)]
 		public void PlaceableTests()
 		{
@@ -457,12 +457,12 @@ namespace L20nTests
 					[b] something related to b
 				}
 			}");
-			
+
 			// for more examples check the different types of expressions
 		}
 
 		[Test(), Timeout(2000)]
-		public void UnquotedTextTests()	
+		public void UnquotedTextTests()
 		{
 			Assert.IsNotNull(AnyText.ParseUnquoted(NCS("this is fine")));
 			Assert.IsNotNull(AnyText.ParseUnquoted(NCS("can be almost anything\nanother line")));
@@ -472,15 +472,15 @@ namespace L20nTests
 			Assert.IsNotNull(AnyText.ParseUnquoted(cs));
 			Assert.AreEqual("{it will stop", cs.ReadUntilEnd());
 		}
-		
+
 		[Test(), Timeout(2000)]
-		public void QuotedTextTests()	
+		public void QuotedTextTests()
 		{
 			Assert.IsNotNull(AnyText.ParseQuoted(NCS("this is fine")));
 			Assert.IsNotNull(AnyText.ParseQuoted(NCS("can be almost anything\nanother line")));
 			Assert.IsNotNull(AnyText.ParseQuoted(NCS("curly brackets to have be escaped like this: \\{")));
 			Assert.IsNotNull(AnyText.ParseQuoted(NCS("a quote has to be escaped like this: \\\"")));
-			
+
 			CharStream cs = NCS("otherwise {it will stop");
 			Assert.IsNotNull(AnyText.ParseQuoted(cs));
 			Assert.AreEqual("{it will stop", cs.ReadUntilEnd());
@@ -489,9 +489,9 @@ namespace L20nTests
 			Assert.IsNotNull(AnyText.ParseQuoted(cs));
 			Assert.AreEqual("\"it will stop", cs.ReadUntilEnd());
 		}
-		
+
 		[Test()]
-		public void BlockTextTests()	
+		public void BlockTextTests()
 		{
 			L20n.FTL.AST.INode result;
 			// good examples
@@ -554,7 +554,7 @@ namespace L20nTests
 			checkValidMember("[ui/desc] Hello, { $username }!");
 			checkValidMember("[other] You have now { $count } items!");
 		}
-		
+
 		private void checkValidMessage(string input, string rest = "")
 		{
 			var cs = NCS(input);
@@ -614,7 +614,7 @@ namespace L20nTests
 		{
 			var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(input));
 			var streamReader = new StreamReader(memoryStream);
-			
+
 			var parser = new Parser();
 			var body = parser.Parse(streamReader, new Context(Context.ASTTypes.Full));
 			Assert.IsNotNull(body);
@@ -695,7 +695,7 @@ intro={build ->
 		{
 			var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(input));
 			var streamReader = new StreamReader(memoryStream);
-			
+
 			var parser = new Parser();
 			Throws(() => parser.Parse(streamReader, new Context(Context.ASTTypes.Full)));
 		}
@@ -725,16 +725,16 @@ intro={build ->
 		[Test(), Timeout(2000)]
 		public void ValidFTLFullBodyTest()
 		{
-			var streamReader = StreamReaderFactory.Create("../../resources/parser/example.ftl");
+			var streamReader = StreamReaderFactory.Create("../../Resources/Parsers/example.ftl");
 			var ctx = new Context(Context.ASTTypes.Full);
 			var parser = new Parser();
 			Assert.IsNotNull(parser.Parse(streamReader, ctx));
 		}
-		
+
 		[Test(), Timeout(2000)]
 		public void ValidFTLPartialBodyTest()
 		{
-			var streamReader = StreamReaderFactory.Create("../../resources/parser/example.ftl");
+			var streamReader = StreamReaderFactory.Create("../../Resources/Parsers/example.ftl");
 			var ctx = new Context(Context.ASTTypes.Partial);
 			var parser = new Parser();
 			Assert.IsNotNull(parser.Parse(streamReader, ctx));

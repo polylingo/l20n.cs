@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>L20nTests</RootNamespace>
-    <AssemblyName>L20nTests</AssemblyName>
+    <RootNamespace>L20n.Tests</RootNamespace>
+    <AssemblyName>L20n.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <ReleaseVersion>1.0</ReleaseVersion>
   </PropertyGroup>
@@ -44,7 +44,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\L20n\L20n.csproj">
+    <ProjectReference Include="..\..\src\L20n\L20n.csproj">
       <Project>{CE292B59-9681-4B80-9031-7F6CA120F44D}</Project>
       <Name>L20n</Name>
     </ProjectReference>

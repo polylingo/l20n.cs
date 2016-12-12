@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CE292B59-9681-4B80-9031-7F6CA120F44D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>L20n</RootNamespace>
+    <AssemblyName>L20n</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <ReleaseVersion>1.0</ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Exceptions\ParseException.cs" />
+    <Compile Include="IO\Logger.cs" />
+    <Compile Include="IO\CharStream.cs" />
+    <Compile Include="IO\StreamReaderFactory.cs" />
+    <Compile Include="FTL\Parsers\Context.cs" />
+    <Compile Include="FTL\AST\INode.cs" />
+    <Compile Include="FTL\AST\Body.cs" />
+    <Compile Include="FTL\AST\Entity.cs" />
+    <Compile Include="FTL\Parsers\IParser.cs" />
+    <Compile Include="FTL\Parsers\Parser.cs" />
+    <Compile Include="FTL\Parsers\Comment.cs" />
+    <Compile Include="FTL\AST\Comment.cs" />
+    <Compile Include="FTL\Parsers\NewLine.cs" />
+    <Compile Include="FTL\Parsers\WhiteSpace.cs" />
+    <Compile Include="FTL\AST\StringPrimitive.cs" />
+    <Compile Include="FTL\Parsers\Keyword.cs" />
+    <Compile Include="FTL\Parsers\Identifier.cs" />
+    <Compile Include="FTL\AST\Variable.cs" />
+    <Compile Include="FTL\Parsers\Variable.cs" />
+    <Compile Include="FTL\AST\Number.cs" />
+    <Compile Include="FTL\Parsers\Number.cs" />
+    <Compile Include="FTL\Parsers\Builtin.cs" />
+    <Compile Include="FTL\AST\MemberExpression.cs" />
+    <Compile Include="FTL\Parsers\MemberExpression.cs" />
+    <Compile Include="FTL\AST\KeywordArgument.cs" />
+    <Compile Include="FTL\Parsers\Argument.cs" />
+    <Compile Include="FTL\AST\ArgumentsList.cs" />
+    <Compile Include="FTL\AST\CallExpression.cs" />
+    <Compile Include="FTL\Parsers\CallExpression.cs" />
+    <Compile Include="FTL\Parsers\Expression.cs" />
+    <Compile Include="FTL\AST\Section.cs" />
+    <Compile Include="FTL\Parsers\Section.cs" />
+    <Compile Include="FTL\Parsers\Message.cs" />
+    <Compile Include="FTL\Parsers\Entry.cs" />
+    <Compile Include="FTL\Parsers\MemberKey.cs" />
+    <Compile Include="FTL\AST\Attribute.cs" />
+    <Compile Include="FTL\Parsers\Placeable.cs" />
+    <Compile Include="FTL\AST\Placeable.cs" />
+    <Compile Include="FTL\AST\SelectExpression.cs" />
+    <Compile Include="FTL\AST\Member.cs" />
+    <Compile Include="FTL\Parsers\Member.cs" />
+    <Compile Include="FTL\Parsers\Pattern.cs" />
+    <Compile Include="FTL\AST\Pattern.cs" />
+    <Compile Include="FTL\Parsers\PlaceableExpression.cs" />
+    <Compile Include="FTL\AST\MemberList.cs" />
+    <Compile Include="FTL\Parsers\MemberList.cs" />
+    <Compile Include="FTL\AST\QuotedText.cs" />
+    <Compile Include="FTL\AST\BlockText.cs" />
+    <Compile Include="FTL\Parsers\AnyText.cs" />
+    <Compile Include="IO\Writer.cs" />
+    <Compile Include="Exceptions\SerializeException.cs" />
+    <Compile Include="IO\BufferedStreamReader.cs" />
+    <Compile Include="FTL\AST\Reference.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+    <Folder Include="IO\" />
+    <Folder Include="FTL\" />
+    <Folder Include="FTL\Parsers\" />
+    <Folder Include="FTL\AST\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+</Project>
