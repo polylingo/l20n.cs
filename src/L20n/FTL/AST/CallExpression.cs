@@ -12,7 +12,7 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a call-expression.
+			/// The AST representation for a /call-expression/.
 			/// More Information: <see cref="L20n.FTL.Parsers.CallExpression"/>
 			/// </summary>
 			public sealed class CallExpression : INode

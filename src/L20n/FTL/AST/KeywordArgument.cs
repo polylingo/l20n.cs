@@ -12,7 +12,7 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a keyword-argument.
+			/// The AST representation for a /keyword-argument/.
 			/// More Information: <see cref="L20nCore.L20n.FTL.Parsers.Argument"/>
 			/// </summary>
 			public sealed class KeywordArgument : INode

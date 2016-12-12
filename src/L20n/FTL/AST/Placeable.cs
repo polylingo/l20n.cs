@@ -12,7 +12,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a placeable.
+			/// The AST representation for a /placeable/.
+			/// More Information: <see cref="L20n.FTL.Parsers.Placeable"/>
 			/// </summary>
 			public sealed class Placeable : INode
 			{	

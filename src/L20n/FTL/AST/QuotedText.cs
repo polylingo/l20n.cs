@@ -11,7 +11,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for <quoted-text>.
+			/// The AST representation for /quoted-text/.
+			/// More Information: <see cref="L20n.FTL.Parsers.AnyText"/>
 			/// </summary>
 			public sealed class QuotedText : INode
 			{

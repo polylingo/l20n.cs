@@ -62,7 +62,7 @@ namespace L20n
 			/// Reads the next Character.
 			/// </summary>
 			/// <remarks>
-			/// \r\n counts as one and will be always returns as `NL`
+			/// `\r\n` counts as one and will be always returns as `NL`
 			/// </remarks>
 			public char ReadNext()
 			{

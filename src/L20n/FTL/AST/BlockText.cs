@@ -12,7 +12,7 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for <block-text>.
+			/// The AST representation for /block-text/.
 			/// More Information: <see cref="L20n.FTL.Parsers.BlockText"/>
 			/// </summary>
 			public sealed class BlockText : INode

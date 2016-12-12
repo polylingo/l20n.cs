@@ -12,7 +12,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a <member-list>.
+			/// The AST representation for a /member-list/.
+			/// More Information: <see cref="L20n.FTL.Parsers.MemberList"/>
 			/// </summary>
 			public sealed class MemberList : INode
 			{	

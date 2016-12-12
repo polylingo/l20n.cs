@@ -11,7 +11,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a variable.
+			/// The AST representation for a /variable/.
+			/// More Information: <see cref="L20n.FTL.Parsers.Variable"/>
 			/// </summary>
 			public sealed class Variable : INode
 			{	

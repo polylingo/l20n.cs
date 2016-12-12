@@ -13,9 +13,9 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for an attribute.
+			/// The AST representation for an /attribute/.
 			/// This is not in the official FTL Syntax,
-			/// and is used to store the combination of an identifier and a keyword.
+			/// and is used to store the combination of an /identifier/ and a /keyword/.
 			/// More Information: <see cref="L20n.FTL.Parsers.MemberKey"/>
 			/// </summary>
 			public sealed class Attribute : INode

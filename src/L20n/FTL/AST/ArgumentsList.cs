@@ -12,7 +12,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for an <arglist>.
+			/// The AST representation for an /arglist/.
+			/// More Information: <see cref="L20n.FTL.Parsers.CallExpression"/>
 			/// </summary>
 			public sealed class ArgumentsList : INode
 			{	

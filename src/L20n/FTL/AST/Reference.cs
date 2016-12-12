@@ -11,7 +11,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a reference.
+			/// The AST representation for a /reference/.
+			/// More Information: <see cref="L20n.FTL.Parsers.Expression"/>
 			/// </summary>
 			public sealed class Reference : INode
 			{	

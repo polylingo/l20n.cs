@@ -12,7 +12,7 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a Comment.
+			/// The AST representation for a /comment/.
 			/// More Information: <see cref="L20n.FTL.Parsers.Comment"/>
 			/// </summary>
 			public sealed class Comment : INode

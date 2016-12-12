@@ -11,7 +11,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a section.
+			/// The AST representation for a /section/.
+			/// More Information: <see cref="L20n.FTL.Parsers.Section"/>
 			/// </summary>
 			public sealed class Section : INode
 			{	

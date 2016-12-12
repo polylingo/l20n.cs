@@ -12,8 +12,9 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a <pattern>.
-			/// This can be either quoted or unquoted.
+			/// The AST representation for a /pattern/.
+			/// This can be either a /quoted-pattern/ or /unquoted-pattern/.
+			/// More Information: <see cref="L20n.FTL.Parsers.Pattern"/>
 			/// </summary>
 			public sealed class Pattern : INode
 			{	

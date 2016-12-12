@@ -11,7 +11,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// represents the AST element for an entity, AKA <message>
+			/// represents the AST element for an entity, AKA /message/
+			/// More Information: <see cref="L20n.FTL.Parsers.Message"/>
 			/// </summary>
 			public sealed class Entity : INode
 			{	

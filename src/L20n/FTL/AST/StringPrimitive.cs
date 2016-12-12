@@ -12,7 +12,7 @@ namespace L20n
 		{
 			/// <summary>
 			/// The AST representation for any StringPrimitive.
-			/// Used for <builtin>, <keyword>, <identifier> and <unquotedText>
+			/// Used for /builtin/, /keyword/, /identifier/ and /unquotedText/.
 			/// </summary>
 			public sealed class StringPrimitive : INode
 			{

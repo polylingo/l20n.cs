@@ -12,7 +12,7 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a number.
+			/// The AST representation for a /number/.
 			/// More Information: <see cref="L20n.FTL.Parsers.Number"/>
 			/// </summary>
 			public sealed class Number : INode

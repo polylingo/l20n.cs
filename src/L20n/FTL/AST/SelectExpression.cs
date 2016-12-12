@@ -11,7 +11,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// The AST representation for a select-expression.
+			/// The AST representation for a /select-expression/.
+			/// More Information: <see cref="L20n.FTL.Parsers.PlaceableExpression"/>
 			/// </summary>
 			public sealed class SelectExpression : INode
 			{	

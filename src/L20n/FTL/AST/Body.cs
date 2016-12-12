@@ -13,7 +13,8 @@ namespace L20n
 		namespace AST
 		{
 			/// <summary>
-			/// epresents the Root AST Element, containing all entries
+			/// Represents the Root AST Element, /body/, containing all /entries/.
+			/// More Information: <see cref="L20n.FTL.Parsers.Parser"/>
 			/// </summary>
 			public sealed class Body : INode
 			{
