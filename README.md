@@ -1,6 +1,6 @@
-# l20n.cs
+# l20n.cs [![Travis](https://img.shields.io/travis/polylingo/l20n.cs/master.svg)](https://travis-ci.org/polylingo/l20n.cs)
 
-[![Build Status](https://travis-ci.org/polylingo/l20n.cs.svg?branch=master)](https://travis-ci.org/polylingo/l20n.cs)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/polylingo/l20n.cs/blob/master/LICENSE.md)
 
 An implementation of Mozilla's l20n in C#, supporting .NET2 and above.
 
