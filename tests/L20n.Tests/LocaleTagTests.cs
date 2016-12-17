@@ -83,8 +83,8 @@ namespace L20nTests
 		public void CompareTests()
 		{
 			CompareTest("EN",
-			            new string[]{"EN-GB", "EN", "NL"},
-						new string[]{"EN", "EN-GB", "NL"});
+			            new string[]{"EN-GB-PIRATE", "EN-GB", "EN", "NL"},
+						new string[]{"EN", "EN-GB", "EN-GB-PIRATE", "NL"});
 			CompareTest("EN-US",
 			            new string[]{"FR", "EN", "EN-US-FOO", "EN-GB", "EN-US"},
 			            new string[]{"EN-US", "EN-US-FOO", "EN", "EN-GB", "FR"});

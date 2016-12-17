@@ -73,21 +73,22 @@ namespace L20n
 			// we give a higher value if this localeTag is a pure-language tag.
 			if(m_Region != requested.m_Region) {
 				if(m_Region == null)
-					return 2;
-				return 1;
+					return 3;
+
+				return m_Extension == null ? 2 : 1;
 			}
 
 			// if the extension doesn't match,
 			// we give a higher value if this localeTag is a pure-languageRegion tag.
 			if(m_Extension != requested.m_Extension) {
 				if(m_Extension == null)
-					return 4;
-				return 3;
+					return 5;
+				return 4;
 			}
 
 			// a perfect match,
 			// this is exactly what we're looking for
-			return 5;
+			return 6;
 		}
 
 		/// <summary>
