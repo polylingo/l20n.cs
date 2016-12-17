@@ -1,5 +1,5 @@
-// // Glen De Cauwsemaecker licenses this file to you under the MIT license.
-// // See the LICENSE file in the project root for more information.
+// Glen De Cauwsemaecker licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 using System;
 using System.IO;
 using System.Text;
@@ -35,20 +35,20 @@ namespace L20nTests
 			Assert.AreEqual('\r', cs.PeekNext());
 			Assert.AreEqual(pos, cs.GetBufferPosition());
 			Assert.AreEqual('\r', cs.ReadNext());
-			
+
 			cs.RewindBuffer(pos);
 			Assert.AreEqual(1, pos);
 
 			Assert.AreEqual('\r', cs.PeekNext());
 			Assert.AreEqual('\r', cs.ReadNext());
-			
+
 			pos = cs.GetBufferPosition();
 			Assert.AreEqual(2, pos);
 
 			Assert.AreEqual('\n', cs.PeekNext());
 			Assert.AreEqual(pos, cs.GetBufferPosition());
 			Assert.AreEqual('\n', cs.ReadNext());
-			
+
 			pos = cs.GetBufferPosition();
 			Assert.AreEqual(3, pos);
 
@@ -72,15 +72,15 @@ namespace L20nTests
 
 				pos = cs.GetBufferPosition();
 				Assert.AreEqual(8, pos);
-				
+
 				Assert.AreEqual(0, cs.PeekNext());
 
 				cs.RewindBuffer(3);
-				
+
 				pos = cs.GetBufferPosition();
 				Assert.AreEqual(3, pos);
 			}
-			
+
 			Assert.AreEqual('c', cs.PeekNext());
 			Assert.AreEqual('c', cs.ReadNext());
 			Assert.AreEqual('\n', cs.PeekNext());

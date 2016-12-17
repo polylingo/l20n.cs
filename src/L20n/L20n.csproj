@@ -88,6 +88,8 @@
     <Compile Include="FTL\AST\Reference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FTL\AST\Message.cs" />
+    <Compile Include="LocaleTag.cs" />
+    <Compile Include="Exceptions\InputException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

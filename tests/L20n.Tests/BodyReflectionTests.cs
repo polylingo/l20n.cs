@@ -1,5 +1,5 @@
-// // Glen De Cauwsemaecker licenses this file to you under the MIT license.
-// // See the LICENSE file in the project root for more information.
+// Glen De Cauwsemaecker licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 using System;
 using System.IO;
 using System.Text;
@@ -69,7 +69,7 @@ animal = lion
   | The label of the button below changes depending on the
   | available screen width, allowing for a responsive design.
 ");
-			
+
 			testValidReflection("opened-new-window = { brandName[gender] ->\n" +
 				"  *[masculine] { brandName } otworzyl nowe okno.\n" +
 				"  [feminine] { brandName } otworzyla nowe okno.\n}\n",

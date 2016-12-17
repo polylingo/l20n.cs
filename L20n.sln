@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20n", "src\L20n\L20n.csproj", "{CE292B59-9681-4B80-9031-7F6CA120F44D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20nTests", "tests\L20n.Tests\L20n.Tests.csproj", "{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L20n.Tests", "tests\L20n.Tests\L20n.Tests.csproj", "{26DEFAD2-D458-4569-91F4-B12C6C1A23C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,7 +21,7 @@ Global
 		{CE292B59-9681-4B80-9031-7F6CA120F44D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = L20n.csproj
+		StartupItem = src\L20n\L20n.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
@@ -59,7 +59,7 @@ Global
 		$4.inheritsScope = text/plain
 		$4.scope = text/plain
 		$0.StandardHeader = $5
-		$5.Text = @// Glen De Cauwsemaecker licenses this file to you under the MIT license.\n// See the LICENSE file in the project root for more information.\n
+		$5.Text = @Glen De Cauwsemaecker licenses this file to you under the MIT license.\nSee the LICENSE file in the project root for more information.\n
 		$5.IncludeInNewFiles = True
 		$0.NameConventionPolicy = $6
 		$6.Rules = $7
