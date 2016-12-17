@@ -3,6 +3,7 @@ var hierarchy =
     [ "L20n.IO.BufferedStreamReader", "class_l20n_1_1_i_o_1_1_buffered_stream_reader.html", null ],
     [ "L20n.FTL.Parsers.Context", "class_l20n_1_1_f_t_l_1_1_parsers_1_1_context.html", null ],
     [ "Exception", null, [
+      [ "L20n.Exceptions.InputException", "class_l20n_1_1_exceptions_1_1_input_exception.html", null ],
       [ "L20n.Exceptions.ParseException", "class_l20n_1_1_exceptions_1_1_parse_exception.html", null ],
       [ "L20n.Exceptions.SerializeException", "class_l20n_1_1_exceptions_1_1_serialize_exception.html", null ]
     ] ],
@@ -34,5 +35,6 @@ var hierarchy =
     [ "L20n.FTL.Parsers.IParser", "interface_l20n_1_1_f_t_l_1_1_parsers_1_1_i_parser.html", [
       [ "L20n.FTL.Parsers.Parser", "class_l20n_1_1_f_t_l_1_1_parsers_1_1_parser.html", null ]
     ] ],
+    [ "L20n.LocaleTag", "class_l20n_1_1_locale_tag.html", null ],
     [ "L20n.IO.Writer", "class_l20n_1_1_i_o_1_1_writer.html", null ]
 ];

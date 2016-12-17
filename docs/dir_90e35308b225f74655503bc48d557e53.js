@@ -1,5 +1,8 @@
 var dir_90e35308b225f74655503bc48d557e53 =
 [
+    [ "InputException.cs", "_input_exception_8cs.html", [
+      [ "InputException", "class_l20n_1_1_exceptions_1_1_input_exception.html", "class_l20n_1_1_exceptions_1_1_input_exception" ]
+    ] ],
     [ "ParseException.cs", "_parse_exception_8cs.html", [
       [ "ParseException", "class_l20n_1_1_exceptions_1_1_parse_exception.html", "class_l20n_1_1_exceptions_1_1_parse_exception" ]
     ] ],
